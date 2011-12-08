@@ -63,6 +63,7 @@ final class MyCraft {
 
     public static void main(String[] args) {
         GameController controller = null;
+        
         try {
             System.out.println("YourCraft is starting up.");
             controller = new GameController();
