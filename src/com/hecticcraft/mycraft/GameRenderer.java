@@ -28,6 +28,7 @@
 package com.hecticcraft.mycraft;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Mouse;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
 import org.lwjgl.opengl.Display;
@@ -101,7 +102,38 @@ final class GameRenderer {
                   0.f, 0.f,  0.f,
                   0.f, 1.f,  0.f);
         
+        glRotatef(Mouse.getX(), 0.f, 1.f, 0.f);
+        glRotatef(Mouse.getY(), 1.f, 0.f, 0.f);
+        
+        glColor3f(0.5f, 0.5f, 0.5f);
+        
+        drawQuad(0, 0, 0, 5);
+        
         Display.update();
         Display.sync(60);
-    }  
+    }
+    
+    void drawQuad(float x, float y, float z, float size) {
+        glBegin(GL_TRIANGLE_STRIP);
+        
+        glColor3f(1, 0, 0);
+        glVertex3f(x, y, z); glVertex3f(x, y, z-size); glVertex3f(x+size, y, z); glVertex3f(x+size, y, z-size);
+        
+        /* DEGENERATE */ glVertex3f(x+size, y, z); glVertex3f(x, y+size, z);
+        
+        glColor3f(1, 1, 0);
+        glVertex3f(x, y+size, z); glVertex3f(x, y, z); glVertex3f(x+size, y+size, z); glVertex3f(x+size, y, z);
+        
+        /* DEGENERATE */ glVertex3f(x+size, y, z); glVertex3f(x, y, z-size);
+        
+        glColor3f(0, 1, 0);
+        glVertex3f(x, y, z-size); glVertex3f(x, y+size, z-size); glVertex3f(x+size, y, z-size); glVertex3f(x+size, y+size, z-size);
+        
+        /* DEGENERATE */ glVertex3f(x+size, y+size, z-size); glVertex3f(x, y+size, z-size);
+        
+        glColor3f(0, 1, 1);
+        glVertex3f(x, y+size, z-size); glVertex3f(x, y, z-size); glVertex3f(x, y+size, z); glVertex3f(x, y, z);
+        
+        glEnd();
+    }
 }
