@@ -25,12 +25,6 @@
 //  distribution.
 //  
 
-/* NOTES
- * - postive Z axis: outside the screen
- * - negative Z axis: into the screen
- * - zNear/zFar: distance from camera (which moves around)
- */
-
 package com.hecticcraft.mycraft;
 
 import java.io.IOException;

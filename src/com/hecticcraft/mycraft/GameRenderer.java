@@ -27,28 +27,37 @@
 
 package com.hecticcraft.mycraft;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.ARBVertexBufferObject;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.PixelFormat;
 
 
 /**
- *
+ * GameRenderer is responsible for managing the application's window and
+ * rendering an instance of GameState into it.
+ * 
  * @author Mitchell Kember
  * @version 1.0 07/12/2011
  * @since 07/12/2011
  */
 final class GameRenderer {
     
-    static final int DISPLAY_WIDTH = 800;
-    static final int DISPLAY_HEIGHT = 600;
-    static final int DESIRED_SAMPLES = 8;
+    private static final int DISPLAY_WIDTH = 800;
+    private static final int DISPLAY_HEIGHT = 600;
+    private static final int DESIRED_SAMPLES = 8;
     
-    static final String WINDOW_TITLE = "MyCraft";
+    private static final String WINDOW_TITLE = "MyCraft";
+    
+    private int bufferObjectID;
     
     GameRenderer() throws LWJGLException {
         // Display
@@ -66,6 +75,7 @@ final class GameRenderer {
         
         prepareOpenGL();
         resizeOpenGL();
+        initializeData();
     }
     
     private void prepareOpenGL() {
@@ -113,7 +123,20 @@ final class GameRenderer {
         Display.sync(60);
     }
     
-    void drawQuad(float x, float y, float z, float size) {
+    private void initializeData() {
+        if (GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
+            IntBuffer buffer = BufferUtils.createIntBuffer(1);
+            ARBVertexBufferObject.glGenBuffersARB(buffer);
+            bufferObjectID = buffer.get(0);
+            
+            //FloatBuffer data = new FloatBuffer();
+            
+            ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, bufferObjectID);
+            ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, data, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
+        }
+    }
+    
+    private void drawQuad(float x, float y, float z, float size) {
         glBegin(GL_TRIANGLE_STRIP);
         
         glColor3f(1, 0, 0);
