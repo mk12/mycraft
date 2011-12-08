@@ -1,6 +1,6 @@
 //  
 //  GameController.java
-//  GameController
+//  MyCraft
 //  
 //  Created on 06/12/2011.
 //  Copyright (c) 2011 Mitchell Kember. All rights reserved.
