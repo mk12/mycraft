@@ -27,12 +27,18 @@
 
 package com.hecticcraft.mycraft;
 
+import java.io.IOException;
+import java.util.logging.Level;
 import org.lwjgl.LWJGLException;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
+import org.newdawn.slick.util.ResourceLoader;
 
 //http://www.java-gaming.org/index.php?topic=23813.0
 
@@ -55,6 +61,7 @@ final class GameRenderer {
     private static final String WINDOW_TITLE = "MyCraft";
     
     private int bufferObjectID;
+    private Texture dirtTexture;
     
     GameRenderer() throws LWJGLException {
         // Display
@@ -73,11 +80,13 @@ final class GameRenderer {
         prepareOpenGL();
         resizeOpenGL();
         initializeData();
+        loadTextures();
     }
     
     private void prepareOpenGL() {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_TEXTURE_2D);
 
         glDisable(GL_ALPHA_TEST);
         glDisable(GL_STENCIL_TEST);
@@ -95,7 +104,7 @@ final class GameRenderer {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(45, DISPLAY_WIDTH / DISPLAY_HEIGHT, 1.f, 30.f);
+        gluPerspective(45, (float)DISPLAY_WIDTH / (float)DISPLAY_HEIGHT, 1.f, 30.f);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -110,7 +119,7 @@ final class GameRenderer {
         if (left) camera.strafeRight(-0.1f);
         if (right) camera.strafeRight(0.1f);
         camera.rotateX(y/5.f);
-        camera.rotateY(x/5.f);
+        camera.rotateY(-x/5.f);
         
         camera.updateMatrix();
     }
@@ -118,11 +127,25 @@ final class GameRenderer {
     void render(GameState state) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        glColor3f(0.1f, 0.55f, 0.87f);
-        drawQuad(0, 1.5f, 0, 3);
+        //glColor3f(0.1f, 0.55f, 0.87f);
+        
+        Color.white.bind();
+        dirtTexture.bind();
+        renderCube(0, 1.5f, 0, 3);
         
         Display.update();
         Display.sync(60);
+    }
+    
+    private void loadTextures() {
+        try {
+            dirtTexture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("res/dirt.png"));
+        } catch (IOException ioe) {
+            MyCraft.LOGGER.log(Level.WARNING, ioe.toString(), ioe);
+        }
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
     
     private void initializeData() {/*
@@ -150,23 +173,25 @@ final class GameRenderer {
         }*/
     }
     
-    private void drawQuad(float x, float y, float z, float size) {
+    private void renderCube(float x, float y, float z, float size) {
         size /= 2;
         
         glBegin(GL_TRIANGLE_STRIP);
-        glVertex3f(x+size, y+size, z-size); glVertex3f(x-size, y+size, z-size);
-        glVertex3f(x+size, y+size, z+size); glVertex3f(x-size, y+size, z+size);
-        glVertex3f(x+size, y-size, z+size); glVertex3f(x-size, y-size, z+size);
-        glVertex3f(x+size, y-size, z-size); glVertex3f(x-size, y-size, z-size);
-        glVertex3f(x+size, y+size, z-size); glVertex3f(x-size, y+size, z-size);
+        glTexCoord2f(1, 0); glVertex3f(x+size, y+size, z-size); glTexCoord2f(0, 0); glVertex3f(x-size, y+size, z-size);
+        glTexCoord2f(1, 1); glVertex3f(x+size, y+size, z+size); glTexCoord2f(0, 1); glVertex3f(x-size, y+size, z+size);
+        glTexCoord2f(1, 0); glVertex3f(x+size, y-size, z+size); glTexCoord2f(0, 0); glVertex3f(x-size, y-size, z+size);
+        glTexCoord2f(0, 1); glVertex3f(x+size, y-size, z-size); glTexCoord2f(1, 1); glVertex3f(x-size, y-size, z-size);
+        glTexCoord2f(0, 0); glVertex3f(x+size, y+size, z-size); glTexCoord2f(1, 0); glVertex3f(x-size, y+size, z-size);
         glEnd();
         
         glBegin(GL_TRIANGLE_STRIP);
-        glVertex3f(x-size, y+size, z-size); glVertex3f(x-size, y-size, z-size); glVertex3f(x-size, y+size, z+size); glVertex3f(x-size, y-size, z+size);
+        glTexCoord2f(0, 0); glVertex3f(x-size, y+size, z-size); glTexCoord2f(0, 1); glVertex3f(x-size, y-size, z-size);
+        glTexCoord2f(1, 0); glVertex3f(x-size, y+size, z+size); glTexCoord2f(1, 1); glVertex3f(x-size, y-size, z+size);
         glEnd();
         
         glBegin(GL_TRIANGLE_STRIP);
-        glVertex3f(x+size, y+size, z+size); glVertex3f(x+size, y-size, z+size); glVertex3f(x+size, y+size, z-size); glVertex3f(x+size, y-size, z-size);
+        glTexCoord2f(0, 0); glVertex3f(x+size, y+size, z+size); glTexCoord2f(0, 1); glVertex3f(x+size, y-size, z+size); 
+        glTexCoord2f(1, 0); glVertex3f(x+size, y+size, z-size); glTexCoord2f(1, 1); glVertex3f(x+size, y-size, z-size);
         glEnd();
     }
 }
