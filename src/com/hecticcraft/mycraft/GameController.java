@@ -49,7 +49,7 @@ final class GameController {
         
         Keyboard.create();
         
-        Mouse.setGrabbed(false);
+        Mouse.setGrabbed(true);
         Mouse.create();
     }
     
@@ -67,6 +67,7 @@ final class GameController {
                 processMouse();
                 
                 state.update();
+                renderer.processInput(Keyboard.isKeyDown(Keyboard.KEY_UP), Keyboard.isKeyDown(Keyboard.KEY_DOWN), Keyboard.isKeyDown(Keyboard.KEY_LEFT), Keyboard.isKeyDown(Keyboard.KEY_RIGHT), Mouse.getDX(), Mouse.getDY());
                 renderer.render(state);
             } else {
                 if (Display.isDirty()) {
@@ -80,18 +81,10 @@ final class GameController {
     }
     
     private void processKeyboard() {
-        if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-        }
         
-        if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
-        }
     }
 
     private void processMouse() {
-        // Mouse.getX() and Mouse.getY()
+        
     }
 }

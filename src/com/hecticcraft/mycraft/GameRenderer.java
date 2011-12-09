@@ -28,7 +28,6 @@
 package com.hecticcraft.mycraft;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
 import org.lwjgl.opengl.Display;
@@ -48,7 +47,7 @@ import org.lwjgl.opengl.PixelFormat;
  */
 final class GameRenderer {
     
-    Camera cam = new Camera();
+    private Camera camera = new Camera(new Vector(0, 0, 20), new Vector(0, 0, -1));
     
     private static final int DISPLAY_WIDTH = 800;
     private static final int DISPLAY_HEIGHT = 600;
@@ -90,8 +89,6 @@ final class GameRenderer {
         glDepthFunc(GL_LEQUAL);
         glClearDepth(1.0f);
         glClearColor(0.929f, 0.929f, 0.929f, 0.0f);
-        
-        cam.moveForward(20);
     }
     
     private void resizeOpenGL() {
@@ -105,27 +102,24 @@ final class GameRenderer {
         glLoadIdentity();
     }
     
-    void render(GameState state) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Remeber, player will be moved (in state), camera moves accordingly
+    void processInput(boolean up, boolean down, boolean left, boolean right, int x, int y) {
         glLoadIdentity();
         
-        if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-            
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-        }
+        if (up) camera.moveForward(0.1f);
+        if (down) camera.moveForward(-0.1f);
+        if (left) camera.strafeRight(-0.1f);
+        if (right) camera.strafeRight(0.1f);
+        camera.rotateX(y/5.f);
+        camera.rotateY(x/5.f);
         
-        if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
-            cam.strafeRight(-0.1f);
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
-            cam.strafeRight(0.1f);
-        }
+        camera.updateMatrix();
+    }
+    
+    void render(GameState state) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        cam.updateMatrix();
-        
-        
-        
+        glColor3f(0.1f, 0.55f, 0.87f);
         drawQuad(0, 1.5f, 0, 3);
         
         Display.update();
@@ -161,29 +155,18 @@ final class GameRenderer {
         size /= 2;
         
         glBegin(GL_TRIANGLE_STRIP);
-        glColor3f(0, 0, 0);
         glVertex3f(x+size, y+size, z-size); glVertex3f(x-size, y+size, z-size);
-        
-        glColor3f(1, 0, 0);
         glVertex3f(x+size, y+size, z+size); glVertex3f(x-size, y+size, z+size);
-        
-        glColor3f(0, 1, 0);
         glVertex3f(x+size, y-size, z+size); glVertex3f(x-size, y-size, z+size);
-        
-        glColor3f(0, 0, 1);
         glVertex3f(x+size, y-size, z-size); glVertex3f(x-size, y-size, z-size);
-        
-        glColor3f(0, 0, 0);
         glVertex3f(x+size, y+size, z-size); glVertex3f(x-size, y+size, z-size);
         glEnd();
         
         glBegin(GL_TRIANGLE_STRIP);
-        glColor3f(0, 0, 0);
         glVertex3f(x-size, y+size, z-size); glVertex3f(x-size, y-size, z-size); glVertex3f(x-size, y+size, z+size); glVertex3f(x-size, y-size, z+size);
         glEnd();
         
         glBegin(GL_TRIANGLE_STRIP);
-        glColor3f(1, 1, 1);
         glVertex3f(x+size, y+size, z+size); glVertex3f(x+size, y-size, z+size); glVertex3f(x+size, y+size, z-size); glVertex3f(x+size, y-size, z-size);
         glEnd();
     }

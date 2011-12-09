@@ -45,28 +45,54 @@ class Camera {
     /**
      * The position, in global coordinates.
      */
-    private Vector position = new Vector(0, 0,  0);
+    private Vector position;
     
     /**
      * Represents which direction "up" is, relative to this Camera.
      */
-    private Vector upVector = new Vector(0, 1,  0);
+    private Vector upVector;
     
     /**
      * Represents which direction "right" is, relative to this Camera.
      */
-    private Vector rightVector = new Vector(1, 0,  0);
+    private Vector rightVector;
     
     /**
      * The location this Camera is looking at, relative to this Camera.
      */
-    private Vector lookAt = new Vector(0, 0, -1);
+    private Vector lookAt;
     
+    /**
+     * Creates a new Camera with the specified initial Vectors.
+     * 
+     * @param position position Vector of the Camera
+     * @param upVector up direction Vector
+     * @param rightVector right direction Vector
+     * @param lookAt relative Vector to look at
+     */
     Camera(Vector position, Vector upVector, Vector rightVector, Vector lookAt) {
         this.position = position;
         this.upVector = upVector;
         this.rightVector = rightVector;
         this.lookAt = lookAt;
+    }
+    
+    /**
+     * Creates a new Camera with default upVector (y = 1) and rightVector (x = 1) Vectors.
+     * 
+     * @param position position Vector of the Camera
+     * @param lookAt relative Vector to look at
+     */
+    Camera(Vector position, Vector lookAt) {
+        this(position, new Vector(0, 1, 0), new Vector(1, 0, 0), lookAt);
+    }
+    
+    /**
+     * Creates a new Camera with default Vectors, which place the Camera
+     * right-side-up at the origin, looking towards negative Z.
+     */
+    Camera() {
+        this(new Vector(0, 0, 0), new Vector(0, 0, -1));
     }
     
     /**
@@ -97,7 +123,7 @@ class Camera {
      * @param distance the distance to move forward by
      */
     void moveForward(float distance) {
-        position.add(lookAt.scaled(-distance));
+        position.add(lookAt.scaled(distance));
     }
     
     /**
