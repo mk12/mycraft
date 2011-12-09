@@ -28,6 +28,7 @@
 package com.hecticcraft.mycraft;
 
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -54,7 +55,7 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 final class GameRenderer {
     
-    private Camera camera = new Camera(new Vector(0, 0, 20), new Vector(0, 0, -1));
+    private Camera camera = new Camera(new Vector(1, 3, 10), new Vector(0, 0, -1));
     
     private static final int DISPLAY_WIDTH = 800;
     private static final int DISPLAY_HEIGHT = 600;
@@ -87,7 +88,7 @@ final class GameRenderer {
     }
     
     private void prepareOpenGL() {
-        //glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
 
@@ -107,7 +108,7 @@ final class GameRenderer {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(45, (float)DISPLAY_WIDTH / (float)DISPLAY_HEIGHT, 1.f, 30.f);
+        gluPerspective(45, (float)DISPLAY_WIDTH / (float)DISPLAY_HEIGHT, 1.f, 100.f);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -130,11 +131,7 @@ final class GameRenderer {
     void render(GameState state) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        dirtTexture.bind();/*
-        renderCube(1, 1, -1, 2);
-        renderCube(3, 1, -1, 2);
-        renderCube(3, 3, -1, 2);*/
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 24);
         
         Display.update();
         Display.sync(60);
@@ -147,61 +144,71 @@ final class GameRenderer {
             MyCraft.LOGGER.log(Level.WARNING, ioe.toString(), ioe);
         }
         
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        
+        dirtTexture.bind();
     }
     
     private void initializeData() {
         if (GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
             bufferObjectID = ARBVertexBufferObject.glGenBuffersARB();
             
-            // xyzst
-            float data[] = {  0, 0, 0,     1, 0,
-                              2, 0, 0,     1, 1,
-                              
-                              0, 2, 0,     0, 0,
-                              2, 2, 0,     0, 1,
-                              
-                              0, 2,-2,     1, 0,
-                              2, 2,-2,     1, 1,
-                              
-                              0, 0,-2,     0, 0,
-                              2, 0,-2,     0, 1,
-                              
-                              0, 0, 0,     1, 0,
-                              2, 0, 0,     1, 1, };
+            // Vertex Data interleaved format: XYZST
+            final int position  = 3;
+            final int texcoords = 2;
+            final int sizeOfFloat = 4; // 4 bytes in a float
+            final int vertexDataSize = (position + texcoords) * sizeOfFloat;
+            
+            final float data[] = { // 24 vertices
+                0, 0, 0,     1, 0,
+                2, 0, 0,     1, 1,
+                
+                0, 2, 0,     0, 0,
+                2, 2, 0,     0, 1,
+                
+                0, 2,-2,     1, 0,
+                2, 2,-2,     1, 1,
+                
+                0, 0,-2,     0, 0,
+                2, 0,-2,     0, 1,
+                
+                0, 0, 0,     1, 0,
+                2, 0, 0,     1, 1,
+                
+                2, 0, 0,     0, 0, // degenerate
+                2, 0, 0,     0, 0, // degenerate
+                
+                2, 0, 0,     0, 1,
+                2, 0,-2,     1, 1,
+                
+                2, 2, 0,     0, 0,
+                2, 2,-2,     1, 0,
+                
+                2, 2,-2,     1, 0, // degenerate
+                0, 2,-2,     0, 0, // degenerate
+                
+                0, 2,-2,     0, 0,
+                0, 0,-2,     0, 1,
+                
+                0, 2, 0,     1, 0,
+                0, 0, 0,     1, 1,
+            };
+            
+            FloatBuffer dataBuffer = BufferUtils.createFloatBuffer(24*vertexDataSize);
+            dataBuffer.put(data);
+            dataBuffer.flip();
             
             ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, bufferObjectID);
-            ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, BufferUtils.createFloatBuffer(10*5).put(data), ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
+            ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, dataBuffer, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
             
-            glVertexPointer(3, GL_FLOAT, 5, 0);
-            glTexCoordPointer(2, GL_FLOAT, 5, 3);
+            glVertexPointer(3, GL_FLOAT, vertexDataSize, 0);
+            glTexCoordPointer(2, GL_FLOAT, vertexDataSize, position*sizeOfFloat);
             glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         } else {
             MyCraft.LOGGER.log(Level.SEVERE, "GL_ARB_vertex_buffer_object not supported. Bailing out.");
+            System.exit(1);
         }
-    }
-    
-    private void renderCube(float x, float y, float z, float size) {
-        size /= 2;
-        
-        glBegin(GL_TRIANGLE_STRIP);
-        glTexCoord2f(1, 0); glVertex3f(x+size, y+size, z-size); glTexCoord2f(0, 0); glVertex3f(x-size, y+size, z-size);
-        glTexCoord2f(1, 1); glVertex3f(x+size, y+size, z+size); glTexCoord2f(0, 1); glVertex3f(x-size, y+size, z+size);
-        glTexCoord2f(1, 0); glVertex3f(x+size, y-size, z+size); glTexCoord2f(0, 0); glVertex3f(x-size, y-size, z+size);
-        glTexCoord2f(1, 1); glVertex3f(x+size, y-size, z-size); glTexCoord2f(0, 1); glVertex3f(x-size, y-size, z-size);
-        glTexCoord2f(1, 0); glVertex3f(x+size, y+size, z-size); glTexCoord2f(0, 0); glVertex3f(x-size, y+size, z-size);
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_STRIP);
-        glTexCoord2f(0, 0); glVertex3f(x-size, y+size, z-size); glTexCoord2f(0, 1); glVertex3f(x-size, y-size, z-size);
-        glTexCoord2f(1, 0); glVertex3f(x-size, y+size, z+size); glTexCoord2f(1, 1); glVertex3f(x-size, y-size, z+size);
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_STRIP);
-        glTexCoord2f(0, 0); glVertex3f(x+size, y+size, z+size); glTexCoord2f(0, 1); glVertex3f(x+size, y-size, z+size); 
-        glTexCoord2f(1, 0); glVertex3f(x+size, y+size, z-size); glTexCoord2f(1, 1); glVertex3f(x+size, y-size, z-size);
-        glEnd();
     }
 }
