@@ -62,8 +62,8 @@ final class GameController {
     void run() {
         while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             if (Display.isVisible()) {
-                processKeyboard();
-                processMouse();
+                //processKeyboard();
+                //processMouse();
                 
                 state.update();
                 renderer.processInput(Keyboard.isKeyDown(Keyboard.KEY_UP), Keyboard.isKeyDown(Keyboard.KEY_DOWN), Keyboard.isKeyDown(Keyboard.KEY_LEFT), Keyboard.isKeyDown(Keyboard.KEY_RIGHT), Mouse.getDX(), Mouse.getDY());
