@@ -35,7 +35,7 @@ package com.hecticcraft.mycraft;
  * @author Mitchell Kember
  * @since 08/12/2011
  */
-class Vector {
+final class Vector {
     
     float x;
     float y;

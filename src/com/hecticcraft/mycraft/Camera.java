@@ -38,7 +38,7 @@ import static org.lwjgl.util.glu.GLU.gluLookAt;
  * @author Mitchell Kember
  * @since 08/12/2011
  */
-class Camera {
+final class Camera {
     
     private static final float DEG_TO_RAD = (float)Math.PI / 180.f;
     
