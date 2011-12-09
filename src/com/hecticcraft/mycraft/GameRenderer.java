@@ -29,13 +29,15 @@ package com.hecticcraft.mycraft;
 
 import java.io.IOException;
 import java.util.logging.Level;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.ARBVertexBufferObject;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.PixelFormat;
-import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
@@ -73,7 +75,8 @@ final class GameRenderer {
         try {
             Display.create(new PixelFormat(0, 0, 0, DESIRED_SAMPLES));
         } catch (LWJGLException lwjgle) {
-            System.out.println("Your system doesn't appear to support anti-aliasing.");
+            // Replace this with text on screen
+            System.out.println("Could not enable anti-aliasing. Prepare your eyes for jaggies.");
             Display.create();
         }
         
@@ -84,7 +87,7 @@ final class GameRenderer {
     }
     
     private void prepareOpenGL() {
-        glEnable(GL_CULL_FACE);
+        //glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
 
@@ -127,11 +130,11 @@ final class GameRenderer {
     void render(GameState state) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        //glColor3f(0.1f, 0.55f, 0.87f);
-        
-        Color.white.bind();
-        dirtTexture.bind();
-        renderCube(0, 1.5f, 0, 3);
+        dirtTexture.bind();/*
+        renderCube(1, 1, -1, 2);
+        renderCube(3, 1, -1, 2);
+        renderCube(3, 3, -1, 2);*/
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
         
         Display.update();
         Display.sync(60);
@@ -148,29 +151,36 @@ final class GameRenderer {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
     
-    private void initializeData() {/*
+    private void initializeData() {
         if (GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
-            System.out.println("VBO enabled!");
             bufferObjectID = ARBVertexBufferObject.glGenBuffersARB();
             
-            float verts[] = {  1,  1, -1,
-                              -1,  1, -1,
-                               1,  1,  1,
-                              -1,  1,  1,
-                               1, -1,  1,
-                              -1, -1,  1,
-                               1, -1, -1,
-                              -1, -1, -1,
-                               1,  1, -1 };
-            
-            
+            // xyzst
+            float data[] = {  0, 0, 0,     1, 0,
+                              2, 0, 0,     1, 1,
+                              
+                              0, 2, 0,     0, 0,
+                              2, 2, 0,     0, 1,
+                              
+                              0, 2,-2,     1, 0,
+                              2, 2,-2,     1, 1,
+                              
+                              0, 0,-2,     0, 0,
+                              2, 0,-2,     0, 1,
+                              
+                              0, 0, 0,     1, 0,
+                              2, 0, 0,     1, 1, };
             
             ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, bufferObjectID);
-            ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, BufferUtils.createFloatBuffer(9*3).put(verts), ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
+            ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, BufferUtils.createFloatBuffer(10*5).put(data), ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
             
-            glVertexPointer(3, GL_FLOAT, 0, 0);
+            glVertexPointer(3, GL_FLOAT, 5, 0);
+            glTexCoordPointer(2, GL_FLOAT, 5, 3);
             glEnableClientState(GL_VERTEX_ARRAY);
-        }*/
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        } else {
+            MyCraft.LOGGER.log(Level.SEVERE, "GL_ARB_vertex_buffer_object not supported. Bailing out.");
+        }
     }
     
     private void renderCube(float x, float y, float z, float size) {
@@ -180,8 +190,8 @@ final class GameRenderer {
         glTexCoord2f(1, 0); glVertex3f(x+size, y+size, z-size); glTexCoord2f(0, 0); glVertex3f(x-size, y+size, z-size);
         glTexCoord2f(1, 1); glVertex3f(x+size, y+size, z+size); glTexCoord2f(0, 1); glVertex3f(x-size, y+size, z+size);
         glTexCoord2f(1, 0); glVertex3f(x+size, y-size, z+size); glTexCoord2f(0, 0); glVertex3f(x-size, y-size, z+size);
-        glTexCoord2f(0, 1); glVertex3f(x+size, y-size, z-size); glTexCoord2f(1, 1); glVertex3f(x-size, y-size, z-size);
-        glTexCoord2f(0, 0); glVertex3f(x+size, y+size, z-size); glTexCoord2f(1, 0); glVertex3f(x-size, y+size, z-size);
+        glTexCoord2f(1, 1); glVertex3f(x+size, y-size, z-size); glTexCoord2f(0, 1); glVertex3f(x-size, y-size, z-size);
+        glTexCoord2f(1, 0); glVertex3f(x+size, y+size, z-size); glTexCoord2f(0, 0); glVertex3f(x-size, y+size, z-size);
         glEnd();
         
         glBegin(GL_TRIANGLE_STRIP);
