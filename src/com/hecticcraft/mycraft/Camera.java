@@ -40,7 +40,7 @@ import static org.lwjgl.util.glu.GLU.gluLookAt;
  */
 class Camera {
     
-    private static final float DEG_TO_RAD = 0.0174532925f;
+    private static final float DEG_TO_RAD = (float)Math.PI / 180.f;
     
     /**
      * The position, in global coordinates.
