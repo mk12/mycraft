@@ -62,6 +62,13 @@ class Camera {
      */
     private Vector lookAt = new Vector(0, 0, -1);
     
+    Camera(Vector position, Vector upVector, Vector rightVector, Vector lookAt) {
+        this.position = position;
+        this.upVector = upVector;
+        this.rightVector = rightVector;
+        this.lookAt = lookAt;
+    }
+    
     /**
      * Updates the OpenGL matrix stack for this Camera's view. Call after
      * any Camera transformations, before rendering.
