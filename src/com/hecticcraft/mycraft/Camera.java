@@ -27,90 +27,119 @@
 
 package com.hecticcraft.mycraft;
 
-import javax.vecmath.Vector3d;
 import static org.lwjgl.util.glu.GLU.gluLookAt;
 
-
 /**
- *
+ * Camera manages a camera in 3D spaceL. It calculates the
+ * necessary matrix transformations to orient the camera, and
+ * provides a simplified mechanism for moving the camera via
+ * move and rotate methods.
+ * 
  * @author Mitchell Kember
  * @since 08/12/2011
  */
-public class Camera {
+class Camera {
     
-    private Vector3d  eye = new Vector3d(0, 0,  0);
-    private Vector3d   up = new Vector3d(0, 1,  0);
-    private Vector3d side = new Vector3d(1, 0,  0);
-    private Vector3d look = new Vector3d(0, 0, -1);
+    private static final float DEG_TO_RAD = 0.0174532925f;
     
-    float rotatedX = 0;
-    float rotatedY = 0;
-    float rotatedZ = 0;
+    /**
+     * The position, in global coordinates.
+     */
+    private Vector position = new Vector(0, 0,  0);
     
-    Camera() {
-    }
+    /**
+     * Represents which direction "up" is, relative to this Camera.
+     */
+    private Vector upVector = new Vector(0, 1,  0);
     
+    /**
+     * Represents which direction "right" is, relative to this Camera.
+     */
+    private Vector rightVector = new Vector(1, 0,  0);
+    
+    /**
+     * The location this Camera is looking at, relative to this Camera.
+     */
+    private Vector lookAt = new Vector(0, 0, -1);
+    
+    /**
+     * Updates the OpenGL matrix stack for this Camera's view. Call after
+     * any Camera transformations, before rendering.
+     */
     void updateMatrix() {
-        Vector3d viewpoint = new Vector3d();
-        viewpoint.add(eye, look);
+        Vector globalLookAt = position.plus(lookAt);
         
-        gluLookAt((float)eye.x, (float)eye.y, (float)eye.z,
-                  (float)viewpoint.x, (float)viewpoint.y, (float)viewpoint.z,
-                  (float)up.x, (float)up.y, (float)up.z);
+        gluLookAt((float)position.x,     (float)position.y,     (float)position.z,
+                  (float)globalLookAt.x, (float)globalLookAt.y, (float)globalLookAt.z,
+                  (float)upVector.x,     (float)upVector.y,     (float)upVector.z);
     }
     
-    
-    void move(Vector3d vec) {
-        eye.add(vec);
+    /**
+     * Moves this Camera by global vector {@code vec}.
+     * 
+     * @param vec the movement Vector
+     */
+    void move(Vector vec) {
+        position.add(vec);
     }
     
+    /**
+     * Moves this Camera forward in the direction it is facing. Pass a negative
+     * {@code distance} to move backwards.
+     * 
+     * @param distance the distance to move forward by
+     */
     void moveForward(float distance) {
-        Vector3d vec = new Vector3d();
-        vec.scale(-distance, look);
-        eye.add(vec);
+        position.add(lookAt.scaled(-distance));
     }
+    
+    /**
+     * Moves this Camera upward while facing the same direction. Pass a negative
+     * {@code distance} to move downwards.
+     * 
+     * @param distance the distance to move upward by
+     */
     void moveUpward(float distance) {
-        
+        position.add(upVector.scaled(distance));
     }
+    
+    /**
+     * Moves this Camera to the right while facing the same direction. Pass a negative
+     * {@code distance} to move to the left.
+     * 
+     * @param distance the distance to move to the right by
+     */
     void strafeRight(float distance) {
-        Vector3d vec = new Vector3d();
-        vec.scale(-distance, side);
-        eye.add(vec);
+        position.add(rightVector.scaled(distance));
     }
     
+    /**
+     * Rotates this Camera about the X axis by {@code angle} degrees.
+     * 
+     * @param angle degrees to rotate by
+     */
     void rotateX(float angle) {
-        rotatedX += angle;
-        
-        Vector3d vec = new Vector3d();
-        Vector3d vec2 = new Vector3d();
-        vec.scale(Math.cos(angle * (Math.PI/180)), look);
-        vec2.scale(Math.sin(angle*(Math.PI/180)), up);
-        
-        look = new Vector3d();
-        look.add(vec, vec2);
-        look.normalize();
-        
-        up.cross(look, side);
-        up.scale(-1);
-    }
-    void rotateY(float angle) {
-        rotatedY += angle;
-    }
-    void rotateZ(float angle) {
-        rotatedZ += angle;
-        
-        Vector3d vec = new Vector3d();
-        Vector3d vec2 = new Vector3d();
-        vec.scale(Math.cos(angle * (Math.PI/180)), side);
-        vec2.scale(Math.sin(angle*(Math.PI/180)), up);
-        
-        side = new Vector3d();
-        side.add(vec, vec2);
-        side.normalize();
-        
-        up = new Vector3d();
-        up.cross(look, side);
-        up.scale(-1);
+        lookAt = lookAt.scaled((float)Math.cos(angle*DEG_TO_RAD)).plus(upVector.scaled((float)Math.sin(angle*DEG_TO_RAD))).normalized();
+        upVector = Vector.cross(lookAt, rightVector).scaled(-1);
     }
     
+    /**
+     * Rotates this Camera about the Y axis by {@code angle} degrees.
+     * 
+     * @param angle degrees to rotate by
+     */
+    void rotateY(float angle) {
+        lookAt = lookAt.scaled((float)Math.cos(angle*DEG_TO_RAD)).minus(rightVector.scaled((float)Math.sin(angle*DEG_TO_RAD))).normalized();
+        rightVector = Vector.cross(lookAt, upVector);
+    }
+    
+    /**
+     * Rotates this Camera about the Z axis by {@code angle} degrees.
+     * 
+     * @param angle degrees to rotate by
+     */
+    void rotateZ(float angle) {
+        rightVector = rightVector.scaled((float)Math.cos(angle*DEG_TO_RAD)).plus(upVector.scaled((float)Math.sin(angle*DEG_TO_RAD))).normalized();
+        upVector = Vector.cross(lookAt, rightVector).scaled(-1);
+    } 
 }

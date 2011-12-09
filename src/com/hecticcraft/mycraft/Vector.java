@@ -36,6 +36,7 @@ package com.hecticcraft.mycraft;
  * @since 08/12/2011
  */
 class Vector {
+    
     float x;
     float y;
     float z;
