@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.lwjgl.LWJGLException;
 
 /**
  * MyCraft is an open source java game that uses the LightWeight Java
@@ -45,7 +46,7 @@ import java.util.logging.Logger;
  */
 final class MyCraft {
     
-    private static final Logger LOGGER = Logger.getLogger(MyCraft.class.getName());
+    static final Logger LOGGER = Logger.getLogger(MyCraft.class.getName());
 
     static {
         try {
@@ -62,8 +63,8 @@ final class MyCraft {
             System.out.println("YourCraft is starting up.");
             controller = new GameController();
             controller.run();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
+        } catch (LWJGLException lwjgle) {
+            LOGGER.log(Level.SEVERE, lwjgle.toString(), lwjgle);
         } finally {
             if (controller != null) {
                 controller.destroy();
