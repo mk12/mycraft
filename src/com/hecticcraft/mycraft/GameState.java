@@ -30,7 +30,6 @@ package com.hecticcraft.mycraft;
 /**
  *
  * @author Mitchell Kember
- * @version 1.0 07/12/2011
  * @since 07/12/2011
  */
 final class GameState {
