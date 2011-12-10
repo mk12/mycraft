@@ -28,7 +28,9 @@
 package com.hecticcraft.mycraft;
 
 /**
- * Player 
+ * Player represents the user in the MyCraft world. It is essentially a view
+ * into the world because the Player cannot see himself or herself, but the
+ * Player class also manages a Player's movement and physics.
  * 
  * @author Mitchell Kember
  * @since 09/12/2011
@@ -47,7 +49,7 @@ public class Player {
      * The number of units above this Player's feet that the head or Camera
      * is stationed.
      */
-    private static final int CAMERA_HEIGHT = 3;
+    private static final float CAMERA_HEIGHT = 1.5f;
     
     private float GROUND = 0;
     
