@@ -34,11 +34,18 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 /**
- *
+ * GameController is the main controller in the Model-View-Controller (MVC)
+ * design architecture for this application. It receives user input and mediates
+ * between the GameState and GameRenderer.
+ * 
  * @author Mitchell Kember
  * @since 07/12/2011
+ * @see GameState
+ * @see GameRenderer
  */
 final class GameController {
+    
+    private static final float MAX_DELTA_TIME = 50;
 
     private GameState state;
     private GameRenderer renderer;
@@ -49,16 +56,19 @@ final class GameController {
     private double prevTime;
     
     /**
+     * Creates a new GameController, which manages its own GameState and
+     * GameRenderer.
      * 
-     * 
-     * @throws LWJGLException 
+     * @throws LWJGLException if there was an error loading any part of LWJGL
      */
     GameController() throws LWJGLException {
         state = new GameState();
         renderer = new GameRenderer();
 
         Keyboard.create();
-
+        
+        // This will make the mouse invisible, it will be "grabbed" by the window
+        // so it cannot be seen and cannot leave the window.
         Mouse.setGrabbed(true);
         Mouse.create();
     }
@@ -74,11 +84,29 @@ final class GameController {
     }
     
     /**
+     * Gets the time in milliseconds since this method was last called. If it
+     * is greater than MAX_DELTA_TIME, that will be returned instead.
+     * 
+     * @return the time since this method was last called in milliseconds
+     */
+    float getDeltaTime() {
+        // Get hires time in milliseconds
+        double newTime = (Sys.getTime() * 1000.0) / Sys.getTimerResolution();
+        // Calculate the delta, and make sure it's not over the max
+        float delta = (float)Math.min(newTime - prevTime, MAX_DELTA_TIME);
+        // New becomes old for next call
+        prevTime = newTime;
+        
+        return delta;
+    }
+    
+    /**
      * The run loop. The application will stay inside this method until it exits.
      */
     void run() {
         while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             if (Display.isVisible()) {
+                
                 //processKeyboard();
                 //processMouse();
                 
@@ -89,12 +117,7 @@ final class GameController {
                         Keyboard.isKeyDown(Keyboard.KEY_D),
                         Keyboard.isKeyDown(Keyboard.KEY_SPACE),
                         Mouse.getDX(), Mouse.getDY()));
-                
-                // Get hires time in milliseconds
-                double newTime = (Sys.getTime() * 1000.0) / Sys.getTimerResolution();
-                // Simulate a maximum of 50 milliseconds
-                state.update((float)Math.min(newTime - prevTime, 50));
-                prevTime = newTime;
+                state.update(getDeltaTime());
                 
                 renderer.render(state);
             } else {

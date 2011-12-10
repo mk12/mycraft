@@ -48,6 +48,17 @@ final class GameStateInputData {
     final float lookDeltaX;
     final float lookDeltaY;
     
+    /**
+     * Creates a new GameStateInputData, initializing all fields.
+     * 
+     * @param forwardKey if the key that moves the Player forward is pressed
+     * @param backwardKey if the key that moves the Player backward is pressed
+     * @param leftKey if the key that moves the Player to the left is pressed
+     * @param rightKey if the key that moves the Player to the right is pressed
+     * @param jumpKey if the key that makes the Player jump is pressed
+     * @param lookDeltaX the distance along the x-axis the Player has shifted its gaze
+     * @param lookDeltaY the distance along the y-axis the Player has shifted its gaze
+     */
     GameStateInputData(boolean forwardKey, boolean backwardKey, boolean leftKey, boolean rightKey, boolean jumpKey, float lookDeltaX, float lookDeltaY) {
         this.forwardKey = forwardKey;
         this.backwardKey = backwardKey;
@@ -58,6 +69,14 @@ final class GameStateInputData {
         this.lookDeltaY = lookDeltaY * lookSensitivity;
     }
     
+    /**
+     * Changes the look sensitivity. Smaller values allow looking around more
+     * accurately but more slowly; for example if the mouse is used, a very small
+     * value would require lifting the mouse several times to turn around. Larger
+     * values allow looking around very quickly.
+     * 
+     * @param lookSensitivity the new look sensitivity
+     */
     static void setLookSensitivity(float lookSensitivity) {
         GameStateInputData.lookSensitivity = lookSensitivity * DEFAULT_LOOK_SENSITIVITY;
     }

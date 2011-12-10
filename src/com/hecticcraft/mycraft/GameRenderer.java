@@ -61,9 +61,23 @@ final class GameRenderer {
     
     private static final String WINDOW_TITLE = "MyCraft";
     
+    /**
+     * The furthest away from this Camera an object that will be rendered can be.
+     */
+    private float renderDistance = 100;
+    
+    /**
+     * The ID for the Vertex Buffer Object (VBO).
+     */
     private int bufferObjectID;
+    
     private Texture dirtTexture;
     
+    /**
+     * Creates a new GameRenderer and sets up the LWJGL window.
+     * 
+     * @throws LWJGLException if there is an error setting up the window
+     */
     GameRenderer() throws LWJGLException {
         // Display
         Display.setDisplayMode(new DisplayMode(DISPLAY_WIDTH, DISPLAY_HEIGHT));
@@ -85,6 +99,10 @@ final class GameRenderer {
         loadTextures();
     }
     
+    /**
+     * Enables and Disables various OpenGL states. This should be called once when
+     * the GameRenderer is created.
+     */
     private void prepareOpenGL() {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
@@ -96,22 +114,28 @@ final class GameRenderer {
         glDisable(GL_LIGHTING);
         
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-        glDepthFunc(GL_LEQUAL);
-        glClearDepth(1.0f);
         glClearColor(0.929f, 0.929f, 0.929f, 0.0f);
     }
     
+    /**
+     * Resizes the OpenGL viewport and recalculates the projection matrix.
+     */
     private void resizeOpenGL() {
         glViewport(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(45, (float)DISPLAY_WIDTH / (float)DISPLAY_HEIGHT, 1.f, 100.f);
+        gluPerspective(45, (float)DISPLAY_WIDTH / (float)DISPLAY_HEIGHT, 1.f, renderDistance);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
     }
     
+    /**
+     * Renders a GameState.
+     * 
+     * @param state the GameState to render
+     */
     void render(GameState state) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
@@ -120,12 +144,16 @@ final class GameRenderer {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 30);
         
         //glLoadIdentity();
+        
         // Draw HUD
         
         Display.update();
         Display.sync(60);
     }
     
+    /**
+     * Loads textures that will be used by this GameRenderer.
+     */
     private void loadTextures() {
         try {
             dirtTexture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("res/dirt.png"));
@@ -139,6 +167,11 @@ final class GameRenderer {
         dirtTexture.bind();
     }
     
+    /**
+     * Creates the VBO that this GameRenderer will use.
+     * 
+     * @throws LWJGLException if VBOs are not supported
+     */
     private void initializeData() throws LWJGLException {
         if (GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
             bufferObjectID = ARBVertexBufferObject.glGenBuffersARB();
@@ -156,6 +189,7 @@ final class GameRenderer {
                 0,0,-100,    0, 1,
                 100,0,-100,  1, 1,
                 
+                // Cube
                 0, 0, 0,     0, 0, // degenerate
                 0, 0, 0,     0, 0, // degenerate
                 
@@ -183,7 +217,7 @@ final class GameRenderer {
                 2, 2, 0,     0, 0,
                 2, 2,-2,     1, 0,
                 
-                2, 2,-2,     1, 0, // degenerate
+                2, 2,-2,     0, 0, // degenerate
                 0, 2,-2,     0, 0, // degenerate
                 
                 0, 2,-2,     0, 0,

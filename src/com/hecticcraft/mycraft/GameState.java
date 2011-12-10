@@ -28,7 +28,9 @@
 package com.hecticcraft.mycraft;
 
 /**
- *
+ * GameState is responsible for simulating the MyCraft world. It alone does no
+ * rendering, it simply stores data about the Player and the blocks.
+ * 
  * @author Mitchell Kember
  * @since 07/12/2011
  */

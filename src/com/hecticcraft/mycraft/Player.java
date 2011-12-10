@@ -28,20 +28,32 @@
 package com.hecticcraft.mycraft;
 
 /**
- *
+ * Player 
+ * 
  * @author Mitchell Kember
  * @since 09/12/2011
  */
 public class Player {
     
+    /**
+     * Speed in units per 60 FPS frame for this Player's movement.
+     */
     static final float MOVE_SPEED = 0.2f;
     
     private static final float GRAVITY = -0.015f;
     private static final float INITAL_JUMP_VELOCITY = 0.35f;
+    
+    /**
+     * The number of units above this Player's feet that the head or Camera
+     * is stationed.
+     */
     private static final int CAMERA_HEIGHT = 3;
     
     private float GROUND = 0;
     
+    /**
+     * The view of this Player into the world.
+     */
     private Camera camera;
     
     private boolean isJumping = false;

@@ -30,15 +30,20 @@ package com.hecticcraft.mycraft;
 import static org.lwjgl.util.glu.GLU.gluLookAt;
 
 /**
- * Camera manages a typical first person camera in 3D space. It calculates
- * the necessary matrix transformations to orient the camera, and provides
- * a simplified mechanism for moving the camera via movement and rotation methods.
+ * Camera manages a first person camera in 3D space. It calculates the necessary
+ * matrix transformations to orient the camera, and provides a simplified
+ * mechanism for moving the camera via movement and rotation methods. It makes
+ * heavy use of the Vector class.
  * 
  * @author Mitchell Kember
  * @since 08/12/2011
+ * @see Vector
  */
 final class Camera {
     
+    /**
+     * Constant used  to convert from degrees to radians.
+     */
     private static final float DEG_TO_RAD = (float)Math.PI / 180.f;
     
     /**
@@ -62,8 +67,11 @@ final class Camera {
      */
     private Vector lookAt = new Vector(0, 0, -1);
     
+    /**
+     * Keeps track of this Camera's pitch, used to avoid pitching below
+     * -90 degrees or above +90 degrees.
+     */
     private float rotationX = 0;
-    private float rotationY = 0;
     
     /**
      * Updates the OpenGL matrix stack for this Camera's view. Call after
@@ -115,8 +123,6 @@ final class Camera {
      * @param angle degrees to rotate by
      */
     void pitch(float angle) {
-        rotationY += angle;
-        
         if (rotationX + angle < -89.5f || rotationX + angle > 89.5f) return;
         rotationX += angle;
         lookAt = Vector.axisRotation(lookAt, rightVector, angle*DEG_TO_RAD);
@@ -137,6 +143,10 @@ final class Camera {
         rightVector = Vector.cross(lookAt, skyVector).normalized();
     }
     
+    /**
+     * Sets this Camera's position to {@code y}.
+     * @param y the new position's Y-coordinate
+     */
     void setPositionY(float y) {
         position.y = y;
     }

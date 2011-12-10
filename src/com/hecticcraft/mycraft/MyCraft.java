@@ -35,7 +35,7 @@ import org.lwjgl.LWJGLException;
 
 /**
  * MyCraft is an open source java game that uses the LightWeight Java
- * Game Library (LWJGL), based on the popular game Minecraft.
+ * Game Library (LWJGL). It is inspired by the popular game Minecraft.
  * 
  * "Minecraft" is an official trademark of Mojang AB. This work is not
  * formally related to, endorsed by or affiliated with Minecraft or Mojang AB.
