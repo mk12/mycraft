@@ -40,10 +40,10 @@ public class Player {
     /**
      * Speed in units per 60 FPS frame for this Player's movement.
      */
-    static final float MOVE_SPEED = 0.2f;
+    static final float MOVE_SPEED = 0.1f;
     
     private static final float GRAVITY = -0.015f;
-    private static final float INITAL_JUMP_VELOCITY = 0.35f;
+    private static final float INITAL_JUMP_VELOCITY = 0.25f;
     
     /**
      * The number of units above this Player's feet that the head or Camera
@@ -52,26 +52,21 @@ public class Player {
     private static final float CAMERA_HEIGHT = 1.5f;
     
     private float GROUND = 0;
-    
-    /**
-     * The view of this Player into the world.
-     */
-    private Camera camera;
-    
     private boolean isJumping = false;
     private float yPosition = 0;
     private float yVelocity = 0;
     
     /**
-     * Creates a new player at the default position.
+     * The view of this Player into the world.
      */
-    Player() {
-        camera = new Camera();
+    private Camera camera = new Camera();
+    
+    {
         camera.move(new Vector(1, yPosition+CAMERA_HEIGHT, 10));
     }
     
     /**
-     * Causes this Player to jump if this Player is on the ground.
+     * Causes this Player to jump unless this Player is already in the air.
      */
     void jump() {
         if (isJumping) return;

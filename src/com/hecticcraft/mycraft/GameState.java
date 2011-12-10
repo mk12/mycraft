@@ -39,14 +39,7 @@ final class GameState {
     /**
      * The one and only Player.
      */
-    private Player player;
-    
-    /**
-     * Creates a new GameState with the default Player.
-     */
-    GameState() {
-        player = new Player();
-    }
+    private Player player = new Player();
     
     /**
      * Process input to move the player. This should be called every frame.

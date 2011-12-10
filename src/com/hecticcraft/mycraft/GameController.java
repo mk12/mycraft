@@ -45,26 +45,23 @@ import org.lwjgl.opengl.Display;
  */
 final class GameController {
     
-    private static final float MAX_DELTA_TIME = 50;
+    private static final float MAX_DELTA_TIME = 50.f;
 
-    private GameState state;
-    private GameRenderer renderer;
+    private GameState state = new GameState();
+    private GameRenderer renderer = new GameRenderer();
     
     /**
      * Used for calculating delta time between frames.
      */
-    private double prevTime;
+    private double prevTime = 0.0;
     
     /**
      * Creates a new GameController, which manages its own GameState and
-     * GameRenderer.
+     * GameRenderer, as well as user input (LWJGL Keyboard and Mouse).
      * 
      * @throws LWJGLException if there was an error loading any part of LWJGL
      */
     GameController() throws LWJGLException {
-        state = new GameState();
-        renderer = new GameRenderer();
-
         Keyboard.create();
         
         // This will make the mouse invisible, it will be "grabbed" by the window
@@ -130,11 +127,11 @@ final class GameController {
             }
         }
     }
-
+    
     private void processKeyboard() {
         // UI/HUD stuff
     }
-
+    
     private void processMouse() {
         // UI/HUD stuff
     }

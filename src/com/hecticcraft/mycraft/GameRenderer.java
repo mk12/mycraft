@@ -28,7 +28,8 @@
 package com.hecticcraft.mycraft;
 
 import java.io.IOException;
-import java.nio.FloatBuffer;
+import java.nio.BufferOverflowException;
+import java.nio.IntBuffer;
 import java.util.logging.Level;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -86,22 +87,23 @@ final class GameRenderer {
         
         // Try using oversampling for smooth edges.
         try {
-            Display.create(new PixelFormat(0, 0, 0, DESIRED_SAMPLES));
+            Display.create(new PixelFormat(0, 24, 0, DESIRED_SAMPLES));
         } catch (LWJGLException lwjgle) {
             // Replace this with text on screen
             System.out.println("Could not enable anti-aliasing. Brace yourself for jaggies.");
-            Display.create();
+            Display.create(new PixelFormat(0, 24, 0, 0));
         }
         
         prepareOpenGL();
         resizeOpenGL();
         initializeData();
         loadTextures();
+        uploadDataForChunk(new Chunk());
     }
     
     /**
      * Enables and Disables various OpenGL states. This should be called once when
-     * the GameRenderer is created.
+     * the GameRenderer is created, before any rendering.
      */
     private void prepareOpenGL() {
         glEnable(GL_CULL_FACE);
@@ -141,7 +143,8 @@ final class GameRenderer {
         
         glLoadIdentity();
         state.getPlayerView().updateMatrix();
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 30);
+        // Start at 1 to avoid drawing 1st degenerate and messing everything else up
+        glDrawArrays(GL_TRIANGLE_STRIP, 1, numverts);
         
         //glLoadIdentity();
         
@@ -161,8 +164,11 @@ final class GameRenderer {
             MyCraft.LOGGER.log(Level.WARNING, ioe.toString(), ioe);
         }
         
+        // Use mipmaps!
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         
         dirtTexture.bind();
     }
@@ -173,74 +179,135 @@ final class GameRenderer {
      * @throws LWJGLException if VBOs are not supported
      */
     private void initializeData() throws LWJGLException {
-        if (GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
-            bufferObjectID = ARBVertexBufferObject.glGenBuffersARB();
-            
-            // Vertex Data interleaved format: XYZST
-            final int position  = 3;
-            final int texcoords = 2;
-            final int sizeOfFloat = 4; // 4 bytes in a float
-            final int vertexDataSize = (position + texcoords) * sizeOfFloat;
-            
-            final float data[] = { // 30 vertices
-                // Ground
-                0, 0, 0,     0, 0,
-                100,0,0,     1, 0,
-                0,0,-100,    0, 1,
-                100,0,-100,  1, 1,
-                
-                // Cube
-                0, 0, 0,     0, 0, // degenerate
-                0, 0, 0,     0, 0, // degenerate
-                
-                0, 0, 0,     1, 0,
-                1, 0, 0,     1, 1,
-                
-                0, 1, 0,     0, 0,
-                1, 1, 0,     0, 1,
-                
-                0, 1,-1,     1, 0,
-                1, 1,-1,     1, 1,
-                
-                0, 0,-1,     0, 0,
-                1, 0,-1,     0, 1,
-                
-                0, 0, 0,     1, 0,
-                1, 0, 0,     1, 1,
-                
-                1, 0, 0,     0, 0, // degenerate
-                1, 0, 0,     0, 0, // degenerate
-                
-                1, 0, 0,     0, 1,
-                1, 0,-1,     1, 1,
-                
-                1, 1, 0,     0, 0,
-                1, 1,-1,     1, 0,
-                
-                1, 1,-1,     0, 0, // degenerate
-                0, 1,-1,     0, 0, // degenerate
-                
-                0, 1,-1,     0, 0,
-                0, 0,-1,     0, 1,
-                
-                0, 1, 0,     1, 0,
-                0, 0, 0,     1, 1,
-            };
-            
-            FloatBuffer dataBuffer = BufferUtils.createFloatBuffer(30*vertexDataSize);
-            dataBuffer.put(data);
-            dataBuffer.flip();
-            
-            ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, bufferObjectID);
-            ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, dataBuffer, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
-            
-            glVertexPointer(3, GL_FLOAT, vertexDataSize, 0);
-            glTexCoordPointer(2, GL_FLOAT, vertexDataSize, position*sizeOfFloat);
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        } else {
+        if (!GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
             MyCraft.LOGGER.log(Level.SEVERE, "GL_ARB_vertex_buffer_object not supported.");
             throw new LWJGLException("GL_ARB_vertex_buffer_object not supported");
         }
+        
+        bufferObjectID = ARBVertexBufferObject.glGenBuffersARB();
+
+        // Vertex Data interleaved format: XYZST
+        final int position  = 3;
+        final int texcoords = 2;
+        final int sizeOfInt = 4; // 4 bytes in an int
+        final int vertexDataSize = (position + texcoords) * sizeOfInt;
+        
+        /*
+        final int data[] = { // 30 vertices
+            // Ground
+            0, 0, 0,     0, 0,
+            100,0,0,     100, 0,
+            0,0,-100,    0, 100,
+            100,0,-100,  100, 100,
+
+            // Cube
+            0, 0, 0,     0, 0, // degenerate
+            0, 0, 0,     0, 0, // degenerate
+
+            0, 0, 0,     1, 0,
+            1, 0, 0,     1, 1,
+
+            0, 1, 0,     0, 0,
+            1, 1, 0,     0, 1,
+
+            0, 1,-1,     1, 0,
+            1, 1,-1,     1, 1,
+
+            0, 0,-1,     0, 0,
+            1, 0,-1,     0, 1,
+
+            0, 0, 0,     1, 0,
+            1, 0, 0,     1, 1,
+
+            1, 0, 0,     0, 0, // degenerate
+            1, 0, 0,     0, 0, // degenerate
+
+            1, 0, 0,     0, 1,
+            1, 0,-1,     1, 1,
+
+            1, 1, 0,     0, 0,
+            1, 1,-1,     1, 0,
+
+            1, 1,-1,     0, 0, // degenerate
+            0, 1,-1,     0, 0, // degenerate
+
+            0, 1,-1,     0, 0,
+            0, 0,-1,     0, 1,
+
+            0, 1, 0,     1, 0,
+            0, 0, 0,     1, 1,
+        };
+
+        IntBuffer dataBuffer = BufferUtils.createIntBuffer(30*vertexDataSize);
+        dataBuffer.put(data);
+        dataBuffer.flip();*/
+
+        ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, bufferObjectID);
+        //ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, dataBuffer, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
+
+        glVertexPointer(3, GL_INT, vertexDataSize, 0);
+        glTexCoordPointer(2, GL_INT, vertexDataSize, position*sizeOfInt);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
+    
+    private int numverts;
+    
+    void uploadDataForChunk(Chunk chunk) {
+        IntBuffer vertexData = BufferUtils.createIntBuffer(70000);
+        
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                for (int k = 0; k < 8; k++) {
+                    vertexData.put(cubeData(i,j,k));
+                }
+            }
+        }
+        
+        numverts = vertexData.position()/5;
+        vertexData.flip();
+        
+        ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vertexData, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
+    }
+    
+    int[] cubeData(int x, int y, int z) {
+        return new int[]{ // 23*5 ints
+            x, y, z,     0, 0, // degenerate
+            
+            x, y, z,     1, 0,
+            x+1,y,z,     1, 1,
+            
+            x,y+1,z,     0, 0,
+            x+1,y+1,z,   0, 1,
+            
+            x,y+1,z-1,   1, 0,
+            x+1,y+1,z-1, 1, 1,
+            
+            x,y,z-1,     0, 0,
+            x+1,y,z-1,   0, 1,
+            
+            x, y, z,     1, 0,
+            x+1,y,z,     1, 1,
+            
+            x+1,y,z,     0, 0, // degenerate
+            x+1,y,z,     0, 0, // degenerate
+            
+            x+1,y,z,     0, 1,
+            x+1,y,z-1,   1, 1,
+            
+            x+1,y+1,z,   0, 0,
+            x+1,y+1,z-1, 1, 0,
+            
+            x+1,y+1,z-1, 0, 0, // degenerate
+            x,y+1,z-1,   0, 0, // degenerate
+            
+            x,y+1,z-1,   0, 0,
+            x,y,z-1,     0, 1,
+            
+            x,y+1,z,     1, 0,
+            x, y, z,     1, 1,
+            
+            x, y, z,     0, 0, // degenerate
+        };
     }
 }
