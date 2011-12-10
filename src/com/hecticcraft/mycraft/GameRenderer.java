@@ -55,7 +55,7 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 final class GameRenderer {
     
-    private Camera camera = new Camera(new Vector(1, 3, 10), new Vector(0, 0, -1));
+    private Camera camera = new Camera();
     
     private static final int DISPLAY_WIDTH = 800;
     private static final int DISPLAY_HEIGHT = 600;
@@ -85,6 +85,8 @@ final class GameRenderer {
         resizeOpenGL();
         initializeData();
         loadTextures();
+        
+        camera.move(new Vector(1, 3, 10));
     }
     
     private void prepareOpenGL() {
@@ -115,15 +117,15 @@ final class GameRenderer {
     }
     
     // Remeber, player will be moved (in state), camera moves accordingly
-    void processInput(boolean up, boolean down, boolean left, boolean right, int x, int y) {
+    void moveCamera(boolean up, boolean down, boolean left, boolean right, float x, float y) {
         glLoadIdentity();
         
         if (up) camera.moveForward(0.1f);
         if (down) camera.moveForward(-0.1f);
         if (left) camera.strafeRight(-0.1f);
         if (right) camera.strafeRight(0.1f);
-        camera.rotateX(y/5.f);
-        camera.rotateY(-x/5.f);
+        camera.pitch(y);
+        camera.yaw(-x);
         
         camera.updateMatrix();
     }
@@ -131,7 +133,7 @@ final class GameRenderer {
     void render(GameState state) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 24);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 30);
         
         Display.update();
         Display.sync(60);
@@ -160,7 +162,16 @@ final class GameRenderer {
             final int sizeOfFloat = 4; // 4 bytes in a float
             final int vertexDataSize = (position + texcoords) * sizeOfFloat;
             
-            final float data[] = { // 24 vertices
+            final float data[] = { // 30 vertices
+                // Ground
+                0, 0, 0,     0, 0,
+                100,0,0,     1, 0,
+                0,0,-100,    0, 1,
+                100,0,-100,  1, 1,
+                
+                0, 0, 0,     0, 0, // degenerate
+                0, 0, 0,     0, 0, // degenerate
+                
                 0, 0, 0,     1, 0,
                 2, 0, 0,     1, 1,
                 
@@ -195,7 +206,7 @@ final class GameRenderer {
                 0, 0, 0,     1, 1,
             };
             
-            FloatBuffer dataBuffer = BufferUtils.createFloatBuffer(24*vertexDataSize);
+            FloatBuffer dataBuffer = BufferUtils.createFloatBuffer(30*vertexDataSize);
             dataBuffer.put(data);
             dataBuffer.flip();
             

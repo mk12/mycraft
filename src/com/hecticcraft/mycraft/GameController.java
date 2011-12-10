@@ -39,8 +39,10 @@ import org.lwjgl.opengl.Display;
  */
 final class GameController {
     
-    GameState state;
-    GameRenderer renderer;
+    private GameState state;
+    private GameRenderer renderer;
+    
+    private float mouseSensitivity = 1.f/10.f;
     
     GameController() throws LWJGLException {
         state = new GameState();
@@ -66,7 +68,7 @@ final class GameController {
                 //processMouse();
                 
                 state.update();
-                renderer.processInput(Keyboard.isKeyDown(Keyboard.KEY_UP), Keyboard.isKeyDown(Keyboard.KEY_DOWN), Keyboard.isKeyDown(Keyboard.KEY_LEFT), Keyboard.isKeyDown(Keyboard.KEY_RIGHT), Mouse.getDX(), Mouse.getDY());
+                renderer.moveCamera(Keyboard.isKeyDown(Keyboard.KEY_UP), Keyboard.isKeyDown(Keyboard.KEY_DOWN), Keyboard.isKeyDown(Keyboard.KEY_LEFT), Keyboard.isKeyDown(Keyboard.KEY_RIGHT), Mouse.getDX()*mouseSensitivity, Mouse.getDY()*mouseSensitivity);
                 renderer.render(state);
             } else {
                 if (Display.isDirty()) {

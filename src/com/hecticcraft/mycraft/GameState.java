@@ -34,6 +34,8 @@ package com.hecticcraft.mycraft;
  */
 final class GameState {
     
+    byte[][] chunk;
+    
     GameState() {
         
     }
