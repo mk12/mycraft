@@ -133,7 +133,11 @@ final class Camera {
      * @param angle degrees to rotate by
      */
     void yaw(float angle) {
-        lookAt = Vector.axisRotation(lookAt, skyVector, angle*DEG_TO_RAD);
+        lookAt = Vector.axisRotation(lookAt, skyVector, -angle*DEG_TO_RAD);
         rightVector = Vector.cross(lookAt, skyVector).normalized();
+    }
+    
+    void setPositionY(float y) {
+        position.y = y;
     }
 }

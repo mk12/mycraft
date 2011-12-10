@@ -34,13 +34,63 @@ package com.hecticcraft.mycraft;
  */
 final class GameState {
     
-    byte[][] chunk;
+    /**
+     * The one and only Player.
+     */
+    private Player player;
     
+    /**
+     * Creates a new GameState with the default Player.
+     */
     GameState() {
-        
+        player = new Player();
     }
     
-    void update() {
+    /**
+     * Process input to move the player. This should be called every frame.
+     * 
+     * @param input the GameStateInputData object
+     * @see GameStateInputData
+     */
+    void processInput(GameStateInputData input) {
+        Camera camera = player.getCamera();
+        if (input.forwardKey) {
+            camera.moveForward(Player.MOVE_SPEED);
+        }
+        if (input.backwardKey) {
+            camera.moveForward(-Player.MOVE_SPEED);
+        }
+        if (input.leftKey) {
+            camera.strafeRight(-Player.MOVE_SPEED);
+        }
+        if (input.rightKey) {
+            camera.strafeRight(Player.MOVE_SPEED);
+        }
         
+        camera.pitch(input.lookDeltaY);
+        camera.yaw(input.lookDeltaX);
+        
+        if (input.jumpKey) {
+            player.jump();
+        }
+    }
+    
+    /**
+     * Updates the GameState. This should be called every frame.
+     * 
+     * @param deltaTime time passed since the last call in milliseconds
+     */
+    void update(float deltaTime) {
+        float multiplier = deltaTime / (100.f/6.f);
+        player.update(multiplier);
+    }
+    
+    /**
+     * Gets the Player's Camera object.
+     * 
+     * @return the Player's Camera
+     */
+    Camera getPlayerView() {
+        return player.getCamera();
     }
 }

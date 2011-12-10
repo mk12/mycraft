@@ -55,7 +55,12 @@ final class MyCraft {
             LOGGER.log(Level.WARNING, ioe.toString(), ioe);
         }
     }
-
+    
+    /**
+     * The main method.
+     * 
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         GameController controller = null;
         

@@ -28,6 +28,7 @@
 package com.hecticcraft.mycraft;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -38,22 +39,33 @@ import org.lwjgl.opengl.Display;
  * @since 07/12/2011
  */
 final class GameController {
-    
+
     private GameState state;
     private GameRenderer renderer;
     
-    private float mouseSensitivity = 1.f/10.f;
+    /**
+     * Used for calculating delta time between frames.
+     */
+    private double prevTime;
     
+    /**
+     * 
+     * 
+     * @throws LWJGLException 
+     */
     GameController() throws LWJGLException {
         state = new GameState();
         renderer = new GameRenderer();
-        
+
         Keyboard.create();
-        
+
         Mouse.setGrabbed(true);
         Mouse.create();
     }
     
+    /**
+     * Clean up LWJGL components.
+     */
     void destroy() {
         // Methods already check if created before destroying.
         Mouse.destroy();
@@ -61,14 +73,29 @@ final class GameController {
         Display.destroy();
     }
     
+    /**
+     * The run loop. The application will stay inside this method until it exits.
+     */
     void run() {
         while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             if (Display.isVisible()) {
                 //processKeyboard();
                 //processMouse();
                 
-                state.update();
-                renderer.moveCamera(Keyboard.isKeyDown(Keyboard.KEY_UP), Keyboard.isKeyDown(Keyboard.KEY_DOWN), Keyboard.isKeyDown(Keyboard.KEY_LEFT), Keyboard.isKeyDown(Keyboard.KEY_RIGHT), Mouse.getDX()*mouseSensitivity, Mouse.getDY()*mouseSensitivity);
+                state.processInput(new GameStateInputData(
+                        Keyboard.isKeyDown(Keyboard.KEY_W),
+                        Keyboard.isKeyDown(Keyboard.KEY_S),
+                        Keyboard.isKeyDown(Keyboard.KEY_A),
+                        Keyboard.isKeyDown(Keyboard.KEY_D),
+                        Keyboard.isKeyDown(Keyboard.KEY_SPACE),
+                        Mouse.getDX(), Mouse.getDY()));
+                
+                // Get hires time in milliseconds
+                double newTime = (Sys.getTime() * 1000.0) / Sys.getTimerResolution();
+                // Simulate a maximum of 50 milliseconds
+                state.update((float)Math.min(newTime - prevTime, 50));
+                prevTime = newTime;
+                
                 renderer.render(state);
             } else {
                 if (Display.isDirty()) {
@@ -80,12 +107,12 @@ final class GameController {
             }
         }
     }
-    
+
     private void processKeyboard() {
-        
+        // UI/HUD stuff
     }
 
     private void processMouse() {
-        
+        // UI/HUD stuff
     }
 }

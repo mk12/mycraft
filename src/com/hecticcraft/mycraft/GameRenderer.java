@@ -55,8 +55,6 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 final class GameRenderer {
     
-    private Camera camera = new Camera();
-    
     private static final int DISPLAY_WIDTH = 800;
     private static final int DISPLAY_HEIGHT = 600;
     private static final int DESIRED_SAMPLES = 8;
@@ -77,7 +75,7 @@ final class GameRenderer {
             Display.create(new PixelFormat(0, 0, 0, DESIRED_SAMPLES));
         } catch (LWJGLException lwjgle) {
             // Replace this with text on screen
-            System.out.println("Could not enable anti-aliasing. Prepare your eyes for jaggies.");
+            System.out.println("Could not enable anti-aliasing. Brace yourself for jaggies.");
             Display.create();
         }
         
@@ -85,8 +83,6 @@ final class GameRenderer {
         resizeOpenGL();
         initializeData();
         loadTextures();
-        
-        camera.move(new Vector(1, 3, 10));
     }
     
     private void prepareOpenGL() {
@@ -116,24 +112,15 @@ final class GameRenderer {
         glLoadIdentity();
     }
     
-    // Remeber, player will be moved (in state), camera moves accordingly
-    void moveCamera(boolean up, boolean down, boolean left, boolean right, float x, float y) {
-        glLoadIdentity();
-        
-        if (up) camera.moveForward(0.1f);
-        if (down) camera.moveForward(-0.1f);
-        if (left) camera.strafeRight(-0.1f);
-        if (right) camera.strafeRight(0.1f);
-        camera.pitch(y);
-        camera.yaw(-x);
-        
-        camera.updateMatrix();
-    }
-    
     void render(GameState state) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        glLoadIdentity();
+        state.getPlayerView().updateMatrix();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 30);
+        
+        //glLoadIdentity();
+        // Draw HUD
         
         Display.update();
         Display.sync(60);
@@ -152,7 +139,7 @@ final class GameRenderer {
         dirtTexture.bind();
     }
     
-    private void initializeData() {
+    private void initializeData() throws LWJGLException {
         if (GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
             bufferObjectID = ARBVertexBufferObject.glGenBuffersARB();
             
@@ -218,8 +205,8 @@ final class GameRenderer {
             glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         } else {
-            MyCraft.LOGGER.log(Level.SEVERE, "GL_ARB_vertex_buffer_object not supported. Bailing out.");
-            System.exit(1);
+            MyCraft.LOGGER.log(Level.SEVERE, "GL_ARB_vertex_buffer_object not supported.");
+            throw new LWJGLException("GL_ARB_vertex_buffer_object not supported");
         }
     }
 }
