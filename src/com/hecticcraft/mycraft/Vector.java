@@ -185,4 +185,24 @@ final class Vector {
         if (mag == 0) return new Vector();
         return new Vector(x/mag, y/mag, z/mag); 
     }
+    
+    /**
+     * Rotates {@code vec} about an arbitrary axis {@code axis} by {@code angle}
+     * radians. This does not modify {@code vec}.
+     * 
+     * @param vec the Vector to rotate
+     * @param axis the arbitrary axis to rotate about
+     * @param angle the angle in radians to rotate
+     * @return the rotated Vector
+     */
+    static Vector axisRotation(Vector vec, Vector axis, float angle) {
+        Vector nAxis = axis.normalized();
+        
+        float c = (float)Math.cos(angle);
+        float s = (float)Math.sin(angle);
+        
+        return new Vector(nAxis.x*(nAxis.x*vec.x + nAxis.y*vec.y + nAxis.z*vec.z)*(1.f-c) + vec.x*c + (-nAxis.z*vec.y + nAxis.y*vec.z)*s,
+                          nAxis.y*(nAxis.x*vec.x + nAxis.y*vec.y + nAxis.z*vec.z)*(1.f-c) + vec.y*c + ( nAxis.z*vec.x - nAxis.x*vec.z)*s,
+                          nAxis.z*(nAxis.x*vec.x + nAxis.y*vec.y + nAxis.z*vec.z)*(1.f-c) + vec.z*c + (-nAxis.y*vec.x + nAxis.x*vec.y)*s);
+    }
 }
