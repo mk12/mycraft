@@ -2,7 +2,7 @@
 //  GameRenderer.java
 //  MyCraft
 //  
-//  Created on 06/12/2011.
+//  Created on 07/12/2011.
 //  Copyright (c) 2011 Mitchell Kember. All rights reserved.
 //
 //  This software is provided 'as-is', without any express or implied
@@ -44,9 +44,6 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-//http://www.java-gaming.org/index.php?topic=23813.0
-
-
 /**
  * GameRenderer is responsible for managing the application's window and
  * rendering an instance of GameState into it.
@@ -54,13 +51,19 @@ import org.newdawn.slick.util.ResourceLoader;
  * @author Mitchell Kember
  * @since 07/12/2011
  */
-final class GameRenderer {
+final class GameRenderer implements GameStateListener {
     
     private static final int DISPLAY_WIDTH = 800;
     private static final int DISPLAY_HEIGHT = 600;
+    private static final int DEPTH_BUFFER_BITS = 24;
     private static final int DESIRED_SAMPLES = 8;
     
     private static final String WINDOW_TITLE = "MyCraft";
+    
+    /**
+     * The width and height of the cross hairs in the middle of the screen.
+     */
+    private static final float CROSSHAIR_SIZE = 0.1f;
     
     /**
      * The furthest away from this Camera an object that will be rendered can be.
@@ -74,31 +77,31 @@ final class GameRenderer {
     
     private Texture dirtTexture;
     
+    private int numVerts;
+    
     /**
      * Creates a new GameRenderer and sets up the LWJGL window.
      * 
      * @throws LWJGLException if there is an error setting up the window
      */
     GameRenderer() throws LWJGLException {
-        // Display
         Display.setDisplayMode(new DisplayMode(DISPLAY_WIDTH, DISPLAY_HEIGHT));
         Display.setFullscreen(false);
         Display.setTitle(WINDOW_TITLE);
         
         // Try using oversampling for smooth edges.
         try {
-            Display.create(new PixelFormat(0, 24, 0, DESIRED_SAMPLES));
+            Display.create(new PixelFormat(0, DEPTH_BUFFER_BITS, 0, DESIRED_SAMPLES));
         } catch (LWJGLException lwjgle) {
             // Replace this with text on screen
             System.out.println("Could not enable anti-aliasing. Brace yourself for jaggies.");
-            Display.create(new PixelFormat(0, 24, 0, 0));
+            Display.create(new PixelFormat(0, DEPTH_BUFFER_BITS, 0, 0));
         }
         
         prepareOpenGL();
         resizeOpenGL();
         initializeData();
         loadTextures();
-        uploadDataForChunk(new Chunk());
     }
     
     /**
@@ -143,12 +146,18 @@ final class GameRenderer {
         
         glLoadIdentity();
         state.getPlayerView().updateMatrix();
+        glColor3b((byte)127, (byte)127, (byte)127);
+        
         // Start at 1 to avoid drawing 1st degenerate and messing everything else up
-        glDrawArrays(GL_TRIANGLE_STRIP, 1, numverts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 1, numVerts);
         
-        //glLoadIdentity();
-        
-        // Draw HUD
+        glLoadIdentity();
+        // Draw crosshair
+        glColor3b((byte)-127, (byte)-127, (byte)-127);
+        glBegin(GL_LINES);
+        glVertex3f(-CROSSHAIR_SIZE/2, 0, -1); glVertex3f(CROSSHAIR_SIZE/2, 0, -1);
+        glVertex3f(0, -CROSSHAIR_SIZE/2, -1); glVertex3f(0, CROSSHAIR_SIZE/2, -1);
+        glEnd();
         
         Display.update();
         Display.sync(60);
@@ -243,7 +252,7 @@ final class GameRenderer {
         dataBuffer.flip();*/
 
         ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, bufferObjectID);
-        //ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, dataBuffer, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
+        //ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, dataBuffer, ARBVertexBufferObject.GL_DYNAMIC_DRAW_ARB);
 
         glVertexPointer(3, GL_INT, vertexDataSize, 0);
         glTexCoordPointer(2, GL_INT, vertexDataSize, position*sizeOfInt);
@@ -251,26 +260,16 @@ final class GameRenderer {
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     }
     
-    private int numverts;
-    
-    void uploadDataForChunk(Chunk chunk) {
-        IntBuffer vertexData = BufferUtils.createIntBuffer(70000);
-        
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                for (int k = 0; k < 8; k++) {
-                    vertexData.put(cubeData(i,j,k));
-                }
-            }
-        }
-        
-        numverts = vertexData.position()/5;
-        vertexData.flip();
-        
-        ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vertexData, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
-    }
-    
-    int[] cubeData(int x, int y, int z) {
+    /**
+     * Calculates vertices for a cube located at ({@code x}, {@code y}, {@code z}).
+     * The vertices must be rendered with GL_TRIANGLE_STRIP.
+     * 
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @param z the z-coordinate
+     * @return the vertices in interleaved XYZST format
+     */
+    private int[] cubeData(int x, int y, int z) {
         return new int[]{ // 23*5 ints
             x, y, z,     0, 0, // degenerate
             
@@ -309,5 +308,29 @@ final class GameRenderer {
             
             x, y, z,     0, 0, // degenerate
         };
+    }
+
+    /**
+     * Updates the VBO when the a {@code chunk} in the GameState has changed.
+     * 
+     * @param chunk the chunk that has changed
+     */
+    @Override
+    public void gameStateChunkChanged(Chunk chunk) {
+        byte[][][] data = chunk.getData();
+        IntBuffer vertexData = BufferUtils.createIntBuffer(70000);
+        
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                for (int z = 0; z > -8; z--) {
+                    if (data[x][y][-z] != 0) vertexData.put(cubeData(x,y,z));
+                }
+            }
+        }
+        
+        numVerts = vertexData.position() / 5;
+        vertexData.flip();
+        
+        ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vertexData, ARBVertexBufferObject.GL_DYNAMIC_DRAW_ARB);
     }
 }

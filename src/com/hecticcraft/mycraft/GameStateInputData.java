@@ -2,7 +2,7 @@
 //  GameStateInputData.java
 //  MyCraft
 //  
-//  Created on 06/12/2011.
+//  Created on 09/12/2011.
 //  Copyright (c) 2011 Mitchell Kember. All rights reserved.
 //
 //  This software is provided 'as-is', without any express or implied
@@ -38,35 +38,39 @@ final class GameStateInputData {
     private static final float DEFAULT_LOOK_SENSITIVITY = 1.f / 10.f;
     private static float lookSensitivity = DEFAULT_LOOK_SENSITIVITY;
     
-    final boolean forwardKey;
-    final boolean backwardKey;
-    final boolean leftKey;
-    final boolean rightKey;
+    final boolean forward;
+    final boolean backward;
+    final boolean left;
+    final boolean right;
     
-    final boolean jumpKey;
+    final boolean jump;
     
     final float lookDeltaX;
     final float lookDeltaY;
     
+    final boolean placeBlock;
+    
     /**
      * Creates a new GameStateInputData, initializing all fields.
      * 
-     * @param forwardKey if the key that moves the Player forward is pressed
-     * @param backwardKey if the key that moves the Player backward is pressed
-     * @param leftKey if the key that moves the Player to the left is pressed
-     * @param rightKey if the key that moves the Player to the right is pressed
-     * @param jumpKey if the key that makes the Player jump is pressed
+     * @param forward if the Player should move forward
+     * @param backward if the Player should move backward
+     * @param left if the Player should move to the left
+     * @param right if the Player should move to the right
+     * @param jump if the Player should jump
      * @param lookDeltaX the distance along the x-axis the Player has shifted its gaze
      * @param lookDeltaY the distance along the y-axis the Player has shifted its gaze
+     * @param placeBlock if the Player should place a block
      */
-    GameStateInputData(boolean forwardKey, boolean backwardKey, boolean leftKey, boolean rightKey, boolean jumpKey, float lookDeltaX, float lookDeltaY) {
-        this.forwardKey = forwardKey;
-        this.backwardKey = backwardKey;
-        this.leftKey = leftKey;
-        this.rightKey = rightKey;
-        this.jumpKey = jumpKey;
+    GameStateInputData(boolean forward, boolean backward, boolean left, boolean right, boolean jump, float lookDeltaX, float lookDeltaY, boolean placeBlock) {
+        this.forward = forward;
+        this.backward = backward;
+        this.left = left;
+        this.right = right;
+        this.jump = jump;
         this.lookDeltaX = lookDeltaX * lookSensitivity;
         this.lookDeltaY = lookDeltaY * lookSensitivity;
+        this.placeBlock = placeBlock;
     }
     
     /**

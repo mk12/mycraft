@@ -2,7 +2,7 @@
 //  Player.java
 //  MyCraft
 //  
-//  Created on 06/12/2011.
+//  Created on 09/12/2011.
 //  Copyright (c) 2011 Mitchell Kember. All rights reserved.
 //
 //  This software is provided 'as-is', without any express or implied
@@ -28,9 +28,9 @@
 package com.hecticcraft.mycraft;
 
 /**
- * Player represents the user in the MyCraft world. It is essentially a view
- * into the world because the Player cannot see himself or herself, but the
- * Player class also manages a Player's movement and physics.
+ * Player represents the user in the MyCraft world. A Player is primarily a view
+ * into the MyCraft world, and so much of the work is done by the Camera which
+ * the Player owns. This class also manages a Player's movements and physics.
  * 
  * @author Mitchell Kember
  * @since 09/12/2011
@@ -42,7 +42,14 @@ public class Player {
      */
     static final float MOVE_SPEED = 0.1f;
     
+    /**
+     * The pull of gravity, in units per 60 FPS frame.
+     */
     private static final float GRAVITY = -0.015f;
+    
+    /**
+     * The initial upward velocity this Player will have upon jumping.
+     */
     private static final float INITAL_JUMP_VELOCITY = 0.25f;
     
     /**
@@ -51,43 +58,66 @@ public class Player {
      */
     private static final float CAMERA_HEIGHT = 1.5f;
     
-    private float GROUND = 0;
+    private float ground = 0;
     private boolean isJumping = false;
     private float yPosition = 0;
     private float yVelocity = 0;
     
     /**
-     * The view of this Player into the world.
+     * The view of this Player into the MyCraft world.
      */
     private Camera camera = new Camera();
     
     {
-        camera.move(new Vector(1, yPosition+CAMERA_HEIGHT, 10));
+        camera.move(new Vector(0, yPosition+CAMERA_HEIGHT, 0));
     }
     
     /**
-     * Causes this Player to jump unless this Player is already in the air.
-     */
-    void jump() {
-        if (isJumping) return;
-        
-        isJumping = true;
-        yVelocity = INITAL_JUMP_VELOCITY;
-    }
-    
-    /**
-     * Updates this Player's Y position if in the air, otherwise does nothing.
-     * This should be called every frame.
+     * Updates this Player's position and Camera. Responds to user input
+     * delegated from GameState through the GameStateInputData object passed
+     * down. This should be called every frame.
      * 
+     * @param input the user input, part of which should move the player
      * @param multiplier the FPS divided by 60 
      */
-    void update(float multiplier) {
+    void update(GameStateInputData input, float multiplier) {
+        // Movement
+        if (input.forward) {
+            camera.moveForward(Player.MOVE_SPEED * multiplier);
+        }
+        if (input.backward) {
+            camera.moveForward(-Player.MOVE_SPEED * multiplier);
+        }
+        if (input.left) {
+            camera.strafeRight(-Player.MOVE_SPEED * multiplier);
+        }
+        if (input.right) {
+            camera.strafeRight(Player.MOVE_SPEED * multiplier);
+        }
+        
+        // Boundaries
+        Vector position = getPosition();
+        if (position.x < 0) position.x = 0;
+        else if (position.x > 8) position.x = 8;
+        if (position.z > 0) position.z = 0;
+        else if (position.z < -8) position.z = -8;
+        
+        // Orient the camera
+        camera.pitch(input.lookDeltaY);
+        camera.yaw(input.lookDeltaX);
+        
+        // Jumping
+        if (input.jump && !isJumping) {
+            isJumping = true;
+            yVelocity = INITAL_JUMP_VELOCITY;
+        }
+        
         if (isJumping) {
             yPosition += yVelocity * multiplier;
             yVelocity += GRAVITY * multiplier;
             
-            if (yPosition < GROUND) {
-                yPosition = GROUND;
+            if (yPosition < ground) {
+                yPosition = ground;
                 yVelocity = 0;
                 isJumping = false;
             }
@@ -103,5 +133,14 @@ public class Player {
      */
     Camera getCamera() {
         return camera;
+    }
+    
+    /**
+     * Gets this Player's position.
+     * 
+     * @return the position
+     */
+    Vector getPosition() {
+        return camera.getPosition();
     }
 }

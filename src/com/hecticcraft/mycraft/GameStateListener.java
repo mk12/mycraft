@@ -1,8 +1,8 @@
 //  
-//  Chunk.java
+//  GameStateListener.java
 //  MyCraft
 //  
-//  Created on 09/12/2011.
+//  Created on 10/12/2011.
 //  Copyright (c) 2011 Mitchell Kember. All rights reserved.
 //
 //  This software is provided 'as-is', without any express or implied
@@ -28,38 +28,12 @@
 package com.hecticcraft.mycraft;
 
 /**
- * Chunk represents a chunk of 8 by 8 by 8 blocks in the MyCraft world.
- * Each block uses one byte to represent its type, totaling 512 bytes to
- * store the information for one Chunk.
+ * Classes that listen and respond to changes in the GameState must implement
+ * this interface. This allows them to be notified when Chunks are modified.
  * 
- * @author Mitchell Kember
- * @since 09/12/2011
+ * @author Michell Kember
+ * @since 10/12/2011
  */
-final class Chunk {
-    
-    // only recalculate connectivity, create new vbo when block changes
-    private Vector position;
-    
-    private byte[][][] data = new byte[8][8][8];
-    
-    {
-        // Place some blocks
-        data[0][0][7] = 1;
-        data[3][1][7] = 1;
-        data[3][0][6] = 1;
-        data[4][2][7] = 1;
-        data[7][0][7] = 1;
-    }
-    
-    void setBlockType(int x, int y, int z, byte type) {
-        data[x][y][z] = type;
-    }
-    
-    byte getBlockType(int x, int y, int z) {
-        return data[x][y][z];
-    }
-    
-    byte[][][] getData() {
-        return data;
-    }
+interface GameStateListener {
+    void gameStateChunkChanged(Chunk chunk);
 }

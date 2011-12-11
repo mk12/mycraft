@@ -2,7 +2,7 @@
 //  GameController.java
 //  MyCraft
 //  
-//  Created on 06/12/2011.
+//  Created on 07/12/2011.
 //  Copyright (c) 2011 Mitchell Kember. All rights reserved.
 //
 //  This software is provided 'as-is', without any express or implied
@@ -34,9 +34,20 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 /**
+ * A tiny enum for identifying mouse buttons.
+ * 
+ * @author Mitchell Kember
+ * @since 10/12/2011
+ */
+enum MouseButton {
+    LEFT,
+    RIGHT
+}
+
+/**
  * GameController is the main controller in the Model-View-Controller (MVC)
- * design architecture for this application. It receives user input and mediates
- * between the GameState and GameRenderer.
+ * design architecture for this application. It handles user input and mediates
+ * between the GameState and GameRenderer classes.
  * 
  * @author Mitchell Kember
  * @since 07/12/2011
@@ -45,15 +56,30 @@ import org.lwjgl.opengl.Display;
  */
 final class GameController {
     
+    /**
+     * The maximum amount of time to simulate over a single frame, in milliseconds.
+     */
     private static final float MAX_DELTA_TIME = 50.f;
-
-    private GameState state = new GameState();
-    private GameRenderer renderer = new GameRenderer();
+    
+    /**
+     * The renderer for this GameController's state.
+     */
+    private GameRenderer renderer;
+    
+    /**
+     * The heart of the game, the GameState.
+     */
+    private GameState state;
+    
+    /**
+     * Used for detecting mouse clicks.
+     */
+    private boolean wasMouseButtonDown = false;
     
     /**
      * Used for calculating delta time between frames.
      */
-    private double prevTime = 0.0;
+    private double previousTime = 0.0;
     
     /**
      * Creates a new GameController, which manages its own GameState and
@@ -62,10 +88,13 @@ final class GameController {
      * @throws LWJGLException if there was an error loading any part of LWJGL
      */
     GameController() throws LWJGLException {
+        renderer = new GameRenderer();
+        state = new GameState(renderer);
+        
         Keyboard.create();
         
-        // This will make the mouse invisible, it will be "grabbed" by the window
-        // so it cannot be seen and cannot leave the window.
+        // This will make the mouse invisible. It will be "grabbed" by the
+        // window, making it invisible and unable to leave the window.
         Mouse.setGrabbed(true);
         Mouse.create();
     }
@@ -85,20 +114,37 @@ final class GameController {
      * is greater than MAX_DELTA_TIME, that will be returned instead.
      * 
      * @return the time since this method was last called in milliseconds
+     * @see #MAX_DELTA_TIME
      */
-    float getDeltaTime() {
+    private float getDeltaTime() {
         // Get hires time in milliseconds
         double newTime = (Sys.getTime() * 1000.0) / Sys.getTimerResolution();
-        // Calculate the delta, and make sure it's not over the max
-        float delta = (float)Math.min(newTime - prevTime, MAX_DELTA_TIME);
+        // Calculate the delta
+        float delta = (float)(newTime - previousTime);
         // New becomes old for next call
-        prevTime = newTime;
+        previousTime = newTime;
         
-        return delta;
+        // Return the delta time unless it's bigger than MAX_DELTA_TIME
+        return (delta < MAX_DELTA_TIME) ? delta : MAX_DELTA_TIME;
     }
     
     /**
-     * The run loop. The application will stay inside this method until it exits.
+     * Determines whether the mouse {@code button} has been clicked or not.
+     * 
+     * @param button which mouse button to check
+     * @return true if it is down and it wasn't last time this method was called
+     */
+    private boolean wasMouseClicked(MouseButton button) {
+        boolean buttonDown = Mouse.isButtonDown(button.ordinal());
+        boolean clicked = (wasMouseButtonDown != buttonDown) && buttonDown;
+        wasMouseButtonDown = buttonDown;
+        
+        return clicked;
+    }
+    
+    /**
+     * The run loop. The application will stay inside this method until the window
+     * is closed or the Escape key is pressed.
      */
     void run() {
         while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
@@ -107,14 +153,15 @@ final class GameController {
                 //processKeyboard();
                 //processMouse();
                 
-                state.processInput(new GameStateInputData(
+                state.update(new GameStateInputData(
                         Keyboard.isKeyDown(Keyboard.KEY_W),
                         Keyboard.isKeyDown(Keyboard.KEY_S),
                         Keyboard.isKeyDown(Keyboard.KEY_A),
                         Keyboard.isKeyDown(Keyboard.KEY_D),
                         Keyboard.isKeyDown(Keyboard.KEY_SPACE),
-                        Mouse.getDX(), Mouse.getDY()));
-                state.update(getDeltaTime());
+                        Mouse.getDX(), Mouse.getDY(),
+                        wasMouseClicked(MouseButton.RIGHT)),
+                        getDeltaTime());
                 
                 renderer.render(state);
             } else {

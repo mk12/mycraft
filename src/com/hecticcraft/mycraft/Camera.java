@@ -2,7 +2,7 @@
 //  Camera.java
 //  MyCraft
 //  
-//  Created on 06/12/2011.
+//  Created on 08/12/2011.
 //  Copyright (c) 2011 Mitchell Kember. All rights reserved.
 //
 //  This software is provided 'as-is', without any express or implied
@@ -149,5 +149,18 @@ final class Camera {
      */
     void setPositionY(float y) {
         position.y = y;
+    }
+    
+    /**
+     * Gets this Camera's position.
+     * 
+     * @return the position
+     */
+    Vector getPosition() {
+        return position;
+    }
+    
+    Vector getLookAt() {
+        return lookAt;
     }
 }
