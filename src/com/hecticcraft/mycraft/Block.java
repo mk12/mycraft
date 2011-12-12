@@ -36,8 +36,18 @@ public class Block {
     int y;
     int z;
     
+    Block(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    
     byte getType(Chunk chunk) {
         return chunk.getData()[x][y][z];
+    }
+    
+    Vector getWorldCoordinates() {
+        return new Vector(x, y, z);
     }
     
     Vector getOpenGLCoordinates() {

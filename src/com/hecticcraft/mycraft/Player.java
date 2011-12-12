@@ -98,7 +98,7 @@ public class Player {
         }
         
         // Boundaries
-        Vector position = getPosition();
+        Vector position = camera.getWorldPosition();
         if (position.x < 0) position.x = 0;
         else if (position.x > 8) position.x = 8;
         if (position.z > 0) position.z = 0;
@@ -135,14 +135,5 @@ public class Player {
      */
     Camera getCamera() {
         return camera;
-    }
-    
-    /**
-     * Gets this Player's position.
-     * 
-     * @return the position
-     */
-    Vector getPosition() {
-        return camera.getPosition();
     }
 }

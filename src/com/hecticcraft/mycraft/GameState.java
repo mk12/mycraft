@@ -67,10 +67,12 @@ final class GameState {
      */
     void update(GameStateInputData input, float deltaTime) {
         float multiplier = deltaTime / (100.f / 6.f);
+        
         player.update(input, multiplier);
+        
         // playerinputdata contain stateinputdata?
         if (input.placeBlock) {
-            //placeBlock();
+            placeBlock();
         }
     }
     
@@ -81,10 +83,10 @@ final class GameState {
      playerv vs gamestate responsibility
      isolate rendering and state (camera .. ) 
      player position and camera position ? **/
-    /*
+    
     private void placeBlock() {
-        Vector position = player.getPosition();
-        Vector sight = player.getCamera().getSight();
+        Vector position = player.getCamera().getWorldPosition();
+        Vector sight = player.getCamera().getWorldSight();
         Vector step;
         
         // XY plane (front and back faces)
@@ -101,7 +103,7 @@ final class GameState {
                 frontBack.add(step);
             }
         }
-    }*/
+    }
     
     /**
      * Gets the Player's Camera object.

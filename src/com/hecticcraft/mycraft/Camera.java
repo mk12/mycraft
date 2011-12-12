@@ -157,14 +157,14 @@ final class Camera {
      * 
      * @return the position
      */
-    Vector getPosition() {
-        return position;
+    Vector getWorldPosition() {
+        return new Vector(position.x, position.y, -position.z);
     }
     
     /**
      * Gets the Vector which represents the direction this Camera is looking.
      */
-    Vector getSight() {
-        return sight;
+    Vector getWorldSight() {
+        return new Vector(sight.x, sight.y, -sight.z);
     }
 }
