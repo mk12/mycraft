@@ -50,7 +50,7 @@ final class Camera {
      * This Vector will always point skyward. There is no need for a changing
      * "up" vector because the horizon should always be level.
      */
-    private static final Vector skyVector = new Vector(0, 1, 0);
+    private static final Vector sky = new Vector(0, 1, 0);
     
     /**
      * The position, in global coordinates.
@@ -60,12 +60,12 @@ final class Camera {
     /**
      * Normalized Vector pointing to the right of this Camera.
      */
-    private Vector rightVector = new Vector(1, 0, 0);
+    private Vector right = new Vector(1, 0, 0);
     
     /**
      * The location this Camera is looking at, relative to this Camera.
      */
-    private Vector lookAt = new Vector(0, 0, -1);
+    private Vector sight = new Vector(0, 0, -1);
     
     /**
      * Keeps track of this Camera's pitch, used to avoid pitching below
@@ -78,11 +78,11 @@ final class Camera {
      * any Camera transformations, before rendering.
      */
     void updateMatrix() {
-        Vector globalLookAt = position.plus(lookAt);
+        Vector lookAt = position.plus(sight);
         
         gluLookAt((float)position.x,      (float)position.y,      (float)position.z,
-                  (float)globalLookAt.x,  (float)globalLookAt.y,  (float)globalLookAt.z,
-                  (float)skyVector.x,     (float)skyVector.y,     (float)skyVector.z);
+                  (float)lookAt.x,  (float)lookAt.y,  (float)lookAt.z,
+                  (float)sky.x,     (float)sky.y,     (float)sky.z);
     }
     
     /**
@@ -102,7 +102,7 @@ final class Camera {
      * @param distance the distance to move forward by
      */
     void moveForward(float distance) {
-        position.add(new Vector(lookAt.x, 0, lookAt.z).normalized().scaled(distance));
+        position.add(new Vector(sight.x, 0, sight.z).normalized().scaled(distance));
     }
     
     /**
@@ -113,7 +113,7 @@ final class Camera {
      * @param distance the distance to move to the right by
      */
     void strafeRight(float distance) {
-        position.add(rightVector.scaled(distance));
+        position.add(right.scaled(distance));
     }
     
     /**
@@ -123,9 +123,9 @@ final class Camera {
      * @param angle degrees to rotate by
      */
     void pitch(float angle) {
-        if (rotationX + angle < -89.5f || rotationX + angle > 89.5f) return;
+        if (rotationX + angle < -89.9f || rotationX + angle > 89.9f) return;
         rotationX += angle;
-        lookAt = Vector.axisRotation(lookAt, rightVector, angle*DEG_TO_RAD);
+        sight = Vector.axisRotation(sight, right, angle*DEG_TO_RAD);
     }
     
     /**
@@ -139,12 +139,13 @@ final class Camera {
      * @param angle degrees to rotate by
      */
     void yaw(float angle) {
-        lookAt = Vector.axisRotation(lookAt, skyVector, -angle*DEG_TO_RAD);
-        rightVector = Vector.cross(lookAt, skyVector).normalized();
+        sight = Vector.axisRotation(sight, sky, -angle*DEG_TO_RAD);
+        right = Vector.cross(sight, sky).normalized();
     }
     
     /**
-     * Sets this Camera's position to {@code y}.
+     * Sets this Camera's position's Y-coordinate to {@code y}.
+     * 
      * @param y the new position's Y-coordinate
      */
     void setPositionY(float y) {
@@ -160,7 +161,10 @@ final class Camera {
         return position;
     }
     
-    Vector getLookAt() {
-        return lookAt;
+    /**
+     * Gets the Vector which represents the direction this Camera is looking.
+     */
+    Vector getSight() {
+        return sight;
     }
 }

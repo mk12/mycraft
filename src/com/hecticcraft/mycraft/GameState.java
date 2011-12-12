@@ -66,38 +66,42 @@ final class GameState {
      * @see GameStateInputData
      */
     void update(GameStateInputData input, float deltaTime) {
-        float multiplier = deltaTime / (100.f/6.f);
+        float multiplier = deltaTime / (100.f / 6.f);
         player.update(input, multiplier);
-        
+        // playerinputdata contain stateinputdata?
         if (input.placeBlock) {
-            Vector position = player.getPosition();
-            Vector lookAt = player.getCamera().getLookAt().normalized();
-            
-            float distXY;
-            // XY plane faces (front and back)
-            int closestZ = (int)Math.floor(position.z);
-            Vector XY = position.plus(lookAt.scaled((closestZ-position.z)/lookAt.z));
-            
-            Vector add = lookAt.scaled(-1.f/lookAt.z);
-            
-            while (XY.x > 0 && XY.x < 8
-                    && XY.y > 0 && XY.y < 8
-                    && XY.z < 0 && XY.z > -8) {
-                
-                if (chunk.getBlockType((int)XY.x, (int)XY.y, -(int)XY.z) != 0) {
-                    distXY = (float)Math.sqrt((XY.x-position.x)*(XY.x-position.x) + (XY.y-position.y)*(XY.y-position.y) + (XY.z-position.z)*(XY.z-position.z));
-                    break;
-                }
-                
-                XY.add(add);
-            }
-            
-            if (XY.x < 8 && XY.y < 8 && XY.z > -8 && XY.x > 0 && XY.y > 0 && XY.z < 0) {
-                chunk.setBlockType((int)(XY.x), (int)(XY.y), -(int)(XY.z)-1, (byte)1);
-                listener.gameStateChunkChanged(chunk);
-            }
+            //placeBlock();
         }
     }
+    
+    /** PROBLEM: camera class in state, but uses RHS system 
+     block class might abstract away
+     passing around blocks (Vector float...)
+     borderline chunks
+     playerv vs gamestate responsibility
+     isolate rendering and state (camera .. ) 
+     player position and camera position ? **/
+    /*
+    private void placeBlock() {
+        Vector position = player.getPosition();
+        Vector sight = player.getCamera().getSight();
+        Vector step;
+        
+        // XY plane (front and back faces)
+        if (sight.z != 0) {
+            Vector frontBack = position.plus(sight.scaled(((int)Math.round(position.z) - position.z) / sight.z));
+            step = sight.scaled(Math.abs(1.f / sight.z));
+
+            while (frontBack.isInsideSquarePrism(0, 8, 0, 8, -8, 0) && frontBack.minus(position).magnitude() < Player.ARM_LENGTH) {
+                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z) != 0) {
+                    chunk.setBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1, (byte)1);
+                    listener.gameStateChunkChanged(chunk);
+                    break;
+                }
+                frontBack.add(step);
+            }
+        }
+    }*/
     
     /**
      * Gets the Player's Camera object.

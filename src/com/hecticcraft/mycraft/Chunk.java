@@ -27,6 +27,15 @@
 
 package com.hecticcraft.mycraft;
 
+enum Direction {
+    FRONT,
+    BEHIND,
+    ABOVE,
+    BELOW,
+    LEFT,
+    RIGHT
+}
+
 /**
  * Chunk represents a chunk of 8 by 8 by 8 blocks in the MyCraft world.
  * Each block uses one byte to represent its type, totaling 512 bytes to
@@ -38,6 +47,7 @@ package com.hecticcraft.mycraft;
 final class Chunk {
     
     // only recalculate connectivity, create new vbo when block changes
+    // negative Z ??
     private Vector position;
     
     private byte[][][] data = new byte[8][8][8];
@@ -49,14 +59,21 @@ final class Chunk {
         data[3][0][6] = 1;
         data[4][2][7] = 1;
         data[7][0][7] = 1;
+        data[2][0][2] = 1;
+    }
+    
+    void setNeighbourBlockType(Direction direction, int x, int y, int z, byte type) {
+        switch (direction) {
+            
+        }
     }
     
     void setBlockType(int x, int y, int z, byte type) {
-        data[x][y][z] = type;
+        data[x][y][-z] = type; // why negative z when this is state calling?
     }
     
     byte getBlockType(int x, int y, int z) {
-        return data[x][y][z];
+        return data[x][y][-z];
     }
     
     byte[][][] getData() {

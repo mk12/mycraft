@@ -30,23 +30,35 @@ package com.hecticcraft.mycraft;
 /**
  * Vector represents a simple three-dimensional vector. In particular, it provides
  * counterparts to most normal methods, returning a new vector rather than modifying
- * an existing one (e.g. add/plus, sub/minus, scale/scaled).
+ * an existing one (e.g. add/plus, sub/minus, scale/scaled). It also provides a
+ * convenient method for axis rotations.
  *
  * @author Mitchell Kember
  * @since 08/12/2011
  */
 final class Vector {
     
+    /**
+     * The X component of this Vector.
+     */
     float x;
+    
+    /**
+     * The Y component of this Vector.
+     */
     float y;
+    
+    /**
+     * The Z component of this Vector.
+     */
     float z;
     
     /**
      * Creates a new Vector with the specified components.
      * 
-     * @param x the x component
-     * @param y the y component
-     * @param z the z component
+     * @param x the X component
+     * @param y the Y component
+     * @param z the Z component
      */
     Vector(float x, float y, float z) {
         this.x = x;
@@ -165,7 +177,7 @@ final class Vector {
     
     /**
      * Calculates this vector scaled by the scalar value {@code s}. This
-     * does not  modify this Vector.
+     * does not modify this Vector.
      * 
      * @param s the multiplier
      * @return the scaled Vector
@@ -204,5 +216,22 @@ final class Vector {
         return new Vector(nAxis.x*(nAxis.x*vec.x + nAxis.y*vec.y + nAxis.z*vec.z)*(1.f-c) + vec.x*c + (-nAxis.z*vec.y + nAxis.y*vec.z)*s,
                           nAxis.y*(nAxis.x*vec.x + nAxis.y*vec.y + nAxis.z*vec.z)*(1.f-c) + vec.y*c + ( nAxis.z*vec.x - nAxis.x*vec.z)*s,
                           nAxis.z*(nAxis.x*vec.x + nAxis.y*vec.y + nAxis.z*vec.z)*(1.f-c) + vec.z*c + (-nAxis.y*vec.x + nAxis.x*vec.y)*s);
+    }
+    
+    /**
+     * Determines if this coordinate represented by this Vector (assuming the Vector
+     * is placed at the origin) is contained by the square prism defined by the
+     * corner vertices ({@code x1}, {@code y1}, {@code z1}) and ({@code x2}, {@code y2}, {@code z2}).
+     * 
+     * @param x1 the X-coordinate of the first corner vertex
+     * @param x2 the X-coordinate of the second corner vertex
+     * @param y1 the Y-coordinate of the first corner vertex
+     * @param y2 the Y-coordinate of the second corner vertex
+     * @param z1 the Z-coordinate of the first corner vertex
+     * @param z2 the Z-coordinate of the second corner vertex
+     * @return true if the the head of this vector is inside the given square prism
+     */
+    boolean isInsideSquarePrism(float x1, float x2, float y1, float y2, float z1, float z2) {
+        return (x >= x1 && x <= x2 && y >= y1 && y <= y2 && z >= z1 && z <= z2);
     }
 }

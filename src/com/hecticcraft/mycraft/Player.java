@@ -37,10 +37,12 @@ package com.hecticcraft.mycraft;
  */
 public class Player {
     
+    static final float ARM_LENGTH = 5.f;
+    
     /**
      * Speed in units per 60 FPS frame for this Player's movement.
      */
-    static final float MOVE_SPEED = 0.1f;
+    private static final float MOVE_SPEED = 0.1f;
     
     /**
      * The pull of gravity, in units per 60 FPS frame.
@@ -83,16 +85,16 @@ public class Player {
     void update(GameStateInputData input, float multiplier) {
         // Movement
         if (input.forward) {
-            camera.moveForward(Player.MOVE_SPEED * multiplier);
+            camera.moveForward(MOVE_SPEED * multiplier);
         }
         if (input.backward) {
-            camera.moveForward(-Player.MOVE_SPEED * multiplier);
+            camera.moveForward(-MOVE_SPEED * multiplier);
         }
         if (input.left) {
-            camera.strafeRight(-Player.MOVE_SPEED * multiplier);
+            camera.strafeRight(-MOVE_SPEED * multiplier);
         }
         if (input.right) {
-            camera.strafeRight(Player.MOVE_SPEED * multiplier);
+            camera.strafeRight(MOVE_SPEED * multiplier);
         }
         
         // Boundaries

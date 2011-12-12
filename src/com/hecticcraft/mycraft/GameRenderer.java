@@ -70,6 +70,8 @@ final class GameRenderer implements GameStateListener {
      */
     private float renderDistance = 100;
     
+    private boolean selectionExists = false;
+    
     /**
      * The ID for the Vertex Buffer Object (VBO).
      */
@@ -151,9 +153,33 @@ final class GameRenderer implements GameStateListener {
         // Start at 1 to avoid drawing 1st degenerate and messing everything else up
         glDrawArrays(GL_TRIANGLE_STRIP, 1, numVerts);
         
+        Vector selectedBlock = new Vector(); //state.getSelectedBlock();
+        glColor3b((byte)-127, (byte)-127, (byte)-127);
+        glBegin(GL_LINE_STRIP);
+        glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z);
+        glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z);
+        glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z);
+        glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z);
+        glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z);
+        glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z-1);
+        glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z-1);
+        glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z-1);
+        glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z-1);
+        glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z-1);
+        glEnd();
+        glBegin(GL_LINES);
+        glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z);
+        glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z-1);
+        
+        glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z);
+        glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z-1);
+        
+        glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z);
+        glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z-1);
+        glEnd();
+        
         glLoadIdentity();
         // Draw crosshair
-        glColor3b((byte)-127, (byte)-127, (byte)-127);
         glBegin(GL_LINES);
         glVertex3f(-CROSSHAIR_SIZE/2, 0, -1); glVertex3f(CROSSHAIR_SIZE/2, 0, -1);
         glVertex3f(0, -CROSSHAIR_SIZE/2, -1); glVertex3f(0, CROSSHAIR_SIZE/2, -1);
@@ -173,7 +199,6 @@ final class GameRenderer implements GameStateListener {
             MyCraft.LOGGER.log(Level.WARNING, ioe.toString(), ioe);
         }
         
-        // Use mipmaps!
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
