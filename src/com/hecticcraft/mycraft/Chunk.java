@@ -69,11 +69,11 @@ final class Chunk {
     }
     
     void setBlockType(int x, int y, int z, byte type) {
-        data[x][y][z] = type; // why negative z when this is state calling?
+        data[x][y][-z] = type; // why negative z when this is state calling?
     }
     
     byte getBlockType(int x, int y, int z) {
-        return data[x][y][z];
+        return data[x][y][-z];
     }
     
     byte[][][] getData() {

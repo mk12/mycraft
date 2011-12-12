@@ -86,7 +86,7 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
     private Camera camera = new Camera();
     
     {
-        camera.move(new Vector(8, height+CAMERA_HEIGHT, 0));
+        camera.move(new Vector(0, height+CAMERA_HEIGHT, 0));
     }
     
     /**
@@ -129,10 +129,10 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
             camera.moveForward(-MOVE_SPEED * multiplier);
         }
         if (input.left) {
-            camera.strafeRight(MOVE_SPEED * multiplier);
+            camera.strafeRight(-MOVE_SPEED * multiplier);
         }
         if (input.right) {
-            camera.strafeRight(-MOVE_SPEED * multiplier);
+            camera.strafeRight(MOVE_SPEED * multiplier);
         }
         
         // Orient the camera

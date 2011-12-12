@@ -80,8 +80,8 @@ final class Camera {
     void updateMatrix() {
         Vector lookAt = position.plus(sight);
         
-        gluLookAt((float)position.x,(float)position.y,  -(float)position.z,
-                  (float)lookAt.x,  (float)lookAt.y,    -(float)lookAt.z,
+        gluLookAt((float)position.x,(float)position.y,  (float)position.z,
+                  (float)lookAt.x,  (float)lookAt.y,    (float)lookAt.z,
                   (float)sky.x,     (float)sky.y,       (float)sky.z);
     }
     
@@ -139,7 +139,7 @@ final class Camera {
      * @param angle degrees to rotate by
      */
     void yaw(float angle) {
-        sight = Vector.axisRotation(sight, sky, angle*DEG_TO_RAD);
+        sight = Vector.axisRotation(sight, sky, -angle*DEG_TO_RAD);
         right = Vector.cross(sight, sky).normalized();
     }
     

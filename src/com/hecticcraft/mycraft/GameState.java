@@ -105,16 +105,13 @@ final class GameState {
             frontBack = position.plus(sight.scaled(((int)Math.round(position.z) - position.z) / sight.z));
             step = sight.scaled(Math.abs(1.f / sight.z));
             
-            System.out.println(frontBack.x + ", " + frontBack.y + ", " + position.z);
-            //System.out.println(s)
-            
             while (frontBack.isInsideSquarePrism(0, 7, 0, 7, -7, 0) && frontBack.minus(position).magnitudeSquared() < ARM_LENGTH_SQUARED) {
                 float distSquared = frontBack.minus(position).magnitudeSquared();
                 if (distSquared > ARM_LENGTH_SQUARED) break;
                 
-                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, -(int)frontBack.z) != 0) {
-                    selectedBlock = new Block((int)frontBack.x, (int)frontBack.y, -(int)frontBack.z);
-                    newBlock = new Block((int)frontBack.x, (int)frontBack.y, -(int)frontBack.z-1);
+                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z) != 0) {
+                    selectedBlock = Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z);
+                    newBlock = Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1);
                     frontBackDistSquared = distSquared;
                     isBlockSelected = true;
                     return;
@@ -160,7 +157,7 @@ final class GameState {
     }
     
     Vector getSelectedBlock() {
-        return new Vector(selectedBlock.x, selectedBlock.y, selectedBlock.z);
+        return selectedBlock.getOpenGLCoordinates();
     }
     
     /**

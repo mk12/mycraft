@@ -32,11 +32,12 @@ package com.hecticcraft.mycraft;
  * @author Mitchell Kember
  */
 public class Block {
+    // store as world
     int x;
     int y;
     int z;
     
-    Block(int x, int y, int z) {
+    private Block(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -56,5 +57,13 @@ public class Block {
     
     Vector getOpenGLCoordinates() {
         return new Vector(x, y, -z);
+    }
+    
+    static Block fromWorld(int x, int y, int z) {
+        return new Block(x, y, z);
+    }
+    
+    static Block fromOpenGL(int x, int y, int z) {
+        return new Block(x, y, -z);
     }
 }
