@@ -80,8 +80,8 @@ final class Camera {
     void updateMatrix() {
         Vector lookAt = position.plus(sight);
         
-        gluLookAt((float)position.x,      (float)position.y,      (float)position.z,
-                  (float)lookAt.x,  (float)lookAt.y,  (float)lookAt.z,
+        gluLookAt((float)position.x,      (float)position.y,      -(float)position.z,
+                  (float)lookAt.x,  (float)lookAt.y,  -(float)lookAt.z,
                   (float)sky.x,     (float)sky.y,     (float)sky.z);
     }
     

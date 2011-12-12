@@ -36,6 +36,9 @@ package com.hecticcraft.mycraft;
  */
 final class GameState {
     
+    /**
+     * The object which listens to state changes (usually the renderer).
+     */
     GameStateListener listener;
     
     /**
@@ -43,8 +46,9 @@ final class GameState {
      */
     private Player player = new Player();
     
-    private boolean isBlockSelected;
-    
+    /**
+     * The one and only Chunk... so far.
+     */
     private Chunk chunk;
     
     /**
@@ -70,9 +74,12 @@ final class GameState {
     void update(GameStateInputData input, float deltaTime) {
         float multiplier = deltaTime / (100.f / 6.f);
         
-        player.update(input, multiplier);
+        player.move(input, multiplier);
+        player.collision(chunk);
+        if (input.jump) player.jump();
+        player.updateHeight(multiplier);
         
-        
+        player.calculateSelectedBlock(chunk);
     }
     
     /** PROBLEM: camera class in state, but uses RHS system 
@@ -84,11 +91,12 @@ final class GameState {
      player position and camera position ? **/
     
     boolean isBlockSelected() {
-        return true;
+        return false;//return player.getSelectedBlock().getType(chunk) != 0;
     }
     
-    Block getSelectedBlock() {
-        return new Block(0, 0, 0);
+    Vector getSelectedBlock() {
+        Block block = player.getSelectedBlock();
+        return new Vector(block.x, block.y, block.z);
     }
     
     /**

@@ -35,9 +35,18 @@ package com.hecticcraft.mycraft;
  * @author Mitchell Kember
  * @since 09/12/2011
  */
-public class Player {
+public class Player {/****** GROUND/isjumping not needed, testing every frame if on block?*****/
     
-    static final float ARM_LENGTH = 5.f;
+    /**
+     * The number of units above this Player's feet that the head or Camera
+     * is stationed.
+     */
+    private static final float CAMERA_HEIGHT = 1.5f;
+    
+    /**
+     * The maximum distance this Player can place a block from.
+     */
+    private static final float ARM_LENGTH = 5.f;
     
     /**
      * Speed in units per 60 FPS frame for this Player's movement.
@@ -54,19 +63,31 @@ public class Player {
      */
     private static final float INITAL_JUMP_VELOCITY = 0.25f;
     
-    /**
-     * The number of units above this Player's feet that the head or Camera
-     * is stationed.
-     */
-    private static final float CAMERA_HEIGHT = 1.5f;
     
-    Block selectedBlock;
+    private Block selectedBlock;
     private Block newBlock;
     
+    /**
+     * Whether this Player is on something solid. If false, this Player is in
+     * the air (either jumping or falling).
+     */
+    private boolean isGrounded = false;
+    
+    /**
+     * The height of what the Player is currently standing on.
+     */
     private float ground = 0;
-    private boolean isJumping = false;
-    private float yPosition = 0;
-    private float yVelocity = 0;
+    
+    /**
+     * The height of this Player; this Player's Y coordinate in 3D space where
+     * positive Y is upwards.
+     */
+    private float height = 0;
+    
+    /**
+     * The vertical velocity of this Player, used for jumping and falling.
+     */
+    private float velocity = 0;
     
     /**
      * The view of this Player into the MyCraft world.
@@ -74,18 +95,41 @@ public class Player {
     private Camera camera = new Camera();
     
     {
-        camera.move(new Vector(0, yPosition+CAMERA_HEIGHT, 0));
+        camera.move(new Vector(0, height+CAMERA_HEIGHT, 0));
     }
     
     /**
-     * Updates this Player's position and Camera. Responds to user input
-     * delegated from GameState through the GameStateInputData object passed
-     * down. This should be called every frame.
-     * 
-     * @param input the user input, part of which should move the player
-     * @param multiplier the FPS divided by 60 
+     * Causes this Player to jump, unless this Player is already in the air
+     * (jumping or falling) in which case nothing happens.
      */
-    void update(GameStateInputData input, float multiplier) {
+    void jump() {
+        if (isGrounded) {
+            isGrounded = false;
+            velocity = INITAL_JUMP_VELOCITY;
+        }
+    }
+    
+    /**
+     * Checks for collision with blocks and moves the Camera accordingly.
+     * 
+     * @param chunk the Chunk this Player is in
+     */
+    void collision(Chunk chunk) {
+        // Boundaries
+        Vector position = camera.getWorldPosition();
+        if (position.x < 0) position.x = 0;
+        else if (position.x > 8) position.x = 8;
+        if (position.z > 0) position.z = 0;
+        else if (position.z < -8) position.z = -8;
+    }
+    
+    /**
+     * Moves this Player and orients this Player's view according to user input.
+     * 
+     * @param input the user input
+     * @param multiplier 
+     */
+    void move(GameStateInputData input, float multiplier) {
         // Movement
         if (input.forward) {
             camera.moveForward(MOVE_SPEED * multiplier);
@@ -103,38 +147,45 @@ public class Player {
         // Orient the camera
         camera.pitch(input.lookDeltaY);
         camera.yaw(input.lookDeltaX);
-        
-        // Boundaries
-        Vector position = camera.getWorldPosition();
-        if (position.x < 0) position.x = 0;
-        else if (position.x > 8) position.x = 8;
-        if (position.z > 0) position.z = 0;
-        else if (position.z < -8) position.z = -8;
-        
-        // Jumping
-        if (input.jump && !isJumping) {
-            isJumping = true;
-            yVelocity = INITAL_JUMP_VELOCITY;
-        }
-        
-        if (isJumping) {
-            yPosition += yVelocity * multiplier;
-            yVelocity += GRAVITY * multiplier;
+    }
+    
+    /**
+     * Updates the height of this Player, if currently in the air. If this player
+     * is on something solid, this does nothing.
+     * 
+     * @param multiplier the framerate-independent multiplier (1 = 60 FPS)
+     */
+    void updateHeight(float multiplier) {
+        if (!isGrounded) {
+            height += velocity * multiplier;
+            velocity += GRAVITY * multiplier;
             
-            if (yPosition < ground) {
-                yPosition = ground;
-                yVelocity = 0;
-                isJumping = false;
+            if (height < ground) {
+                height = ground;
+                velocity = 0;
+                isGrounded = true;
             }
             
-            camera.setPositionY(yPosition+CAMERA_HEIGHT);
-        }
-        
-        if (input.placeBlock) {
-            
+            camera.setPositionY(height+CAMERA_HEIGHT);
         }
     }
     
+    void calculateSelectedBlock(Chunk chunk) {
+        
+    }
+    
+    Block getSelectedBlock() {
+        return selectedBlock;
+    }
+    
+    /**
+     * Gets this Player's Camera object.
+     * 
+     * @return the camera
+     */
+    Camera getCamera() {
+        return camera;
+    }
     
     /*
      * Vector position = player.getCamera().getWorldPosition();
@@ -156,14 +207,4 @@ public class Player {
             }
         }
      */
-    
-    
-    /**
-     * Gets this Player's Camera object.
-     * 
-     * @return the camera
-     */
-    Camera getCamera() {
-        return camera;
-    }
 }
