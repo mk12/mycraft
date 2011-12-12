@@ -36,6 +36,8 @@ package com.hecticcraft.mycraft;
  */
 final class GameState {
     
+    private static final float ARM_LENGTH_SQUARED = 25;
+    
     /**
      * The object which listens to state changes (usually the renderer).
      */
@@ -50,6 +52,10 @@ final class GameState {
      * The one and only Chunk... so far.
      */
     private Chunk chunk;
+    
+    private boolean isBlockSelected;
+    private Block selectedBlock;
+    private Block newBlock;
     
     /**
      * Creates a new GameState with the specified class implementing
@@ -79,7 +85,45 @@ final class GameState {
         if (input.jump) player.jump();
         player.updateHeight(multiplier);
         
-        player.calculateSelectedBlock(chunk);
+        calculateSelectedBlock(chunk);
+        
+        if (input.placeBlock && isBlockSelected) {
+            newBlock.setType(chunk, (byte)1);
+            listener.gameStateChunkChanged(chunk);
+        }
+    }
+    
+    void calculateSelectedBlock(Chunk chunk) {
+        Vector position = player.getCamera().getPosition();
+        Vector sight = player.getCamera().getSight();
+        Vector frontBack;
+        Vector step;
+        
+        // XY plane (front and back faces)
+        float frontBackDistSquared = -1;
+        if (sight.z != 0) {
+            frontBack = position.plus(sight.scaled(((int)Math.round(position.z) - position.z) / sight.z));
+            step = sight.scaled(Math.abs(1.f / sight.z));
+            
+            System.out.println(frontBack.x + ", " + frontBack.y + ", " + position.z);
+            //System.out.println(s)
+            
+            while (frontBack.isInsideSquarePrism(0, 7, 0, 7, -7, 0) && frontBack.minus(position).magnitudeSquared() < ARM_LENGTH_SQUARED) {
+                float distSquared = frontBack.minus(position).magnitudeSquared();
+                if (distSquared > ARM_LENGTH_SQUARED) break;
+                
+                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, -(int)frontBack.z) != 0) {
+                    selectedBlock = new Block((int)frontBack.x, (int)frontBack.y, -(int)frontBack.z);
+                    newBlock = new Block((int)frontBack.x, (int)frontBack.y, -(int)frontBack.z-1);
+                    frontBackDistSquared = distSquared;
+                    isBlockSelected = true;
+                    return;
+                }
+                frontBack.add(step);
+            }
+        }
+        
+        isBlockSelected = false;
     }
     
     /** PROBLEM: camera class in state, but uses RHS system 
@@ -90,13 +134,33 @@ final class GameState {
      isolate rendering and state (camera .. ) 
      player position and camera position ? **/
     
+    /*
+     * Vector position = player.getCamera().getWorldPosition();
+        Vector sight = player.getCamera().getWorldSight();
+        Vector step;
+        
+        // XY plane (front and back faces)
+        if (sight.z != 0) {
+            Vector frontBack = position.plus(sight.scaled(((int)Math.round(position.z) - position.z) / sight.z));
+            step = sight.scaled(Math.abs(1.f / sight.z));
+
+            while (frontBack.isInsideSquarePrism(0, 8, 0, 8, -8, 0) && frontBack.minus(position).magnitude() < Player.ARM_LENGTH) {
+                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z) != 0) {
+                    chunk.setBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1, (byte)1);
+                    listener.gameStateChunkChanged(chunk);
+                    break;
+                }
+                frontBack.add(step);
+            }
+        }
+     */
+    
     boolean isBlockSelected() {
-        return false;//return player.getSelectedBlock().getType(chunk) != 0;
+        return isBlockSelected;
     }
     
     Vector getSelectedBlock() {
-        Block block = player.getSelectedBlock();
-        return new Vector(block.x, block.y, block.z);
+        return new Vector(selectedBlock.x, selectedBlock.y, selectedBlock.z);
     }
     
     /**

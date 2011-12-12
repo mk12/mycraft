@@ -44,11 +44,6 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
     private static final float CAMERA_HEIGHT = 1.5f;
     
     /**
-     * The maximum distance this Player can place a block from.
-     */
-    private static final float ARM_LENGTH = 5.f;
-    
-    /**
      * Speed in units per 60 FPS frame for this Player's movement.
      */
     private static final float MOVE_SPEED = 0.1f;
@@ -62,10 +57,6 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
      * The initial upward velocity this Player will have upon jumping.
      */
     private static final float INITAL_JUMP_VELOCITY = 0.25f;
-    
-    
-    private Block selectedBlock;
-    private Block newBlock;
     
     /**
      * Whether this Player is on something solid. If false, this Player is in
@@ -95,7 +86,7 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
     private Camera camera = new Camera();
     
     {
-        camera.move(new Vector(0, height+CAMERA_HEIGHT, 0));
+        camera.move(new Vector(8, height+CAMERA_HEIGHT, 0));
     }
     
     /**
@@ -116,7 +107,7 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
      */
     void collision(Chunk chunk) {
         // Boundaries
-        Vector position = camera.getWorldPosition();
+        Vector position = camera.getPosition();
         if (position.x < 0) position.x = 0;
         else if (position.x > 8) position.x = 8;
         if (position.z > 0) position.z = 0;
@@ -138,10 +129,10 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
             camera.moveForward(-MOVE_SPEED * multiplier);
         }
         if (input.left) {
-            camera.strafeRight(-MOVE_SPEED * multiplier);
+            camera.strafeRight(MOVE_SPEED * multiplier);
         }
         if (input.right) {
-            camera.strafeRight(MOVE_SPEED * multiplier);
+            camera.strafeRight(-MOVE_SPEED * multiplier);
         }
         
         // Orient the camera
@@ -170,14 +161,6 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
         }
     }
     
-    void calculateSelectedBlock(Chunk chunk) {
-        
-    }
-    
-    Block getSelectedBlock() {
-        return selectedBlock;
-    }
-    
     /**
      * Gets this Player's Camera object.
      * 
@@ -186,25 +169,4 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
     Camera getCamera() {
         return camera;
     }
-    
-    /*
-     * Vector position = player.getCamera().getWorldPosition();
-        Vector sight = player.getCamera().getWorldSight();
-        Vector step;
-        
-        // XY plane (front and back faces)
-        if (sight.z != 0) {
-            Vector frontBack = position.plus(sight.scaled(((int)Math.round(position.z) - position.z) / sight.z));
-            step = sight.scaled(Math.abs(1.f / sight.z));
-
-            while (frontBack.isInsideSquarePrism(0, 8, 0, 8, -8, 0) && frontBack.minus(position).magnitude() < Player.ARM_LENGTH) {
-                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z) != 0) {
-                    chunk.setBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1, (byte)1);
-                    listener.gameStateChunkChanged(chunk);
-                    break;
-                }
-                frontBack.add(step);
-            }
-        }
-     */
 }

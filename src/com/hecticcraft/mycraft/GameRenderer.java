@@ -29,6 +29,7 @@ package com.hecticcraft.mycraft;
 
 import java.io.IOException;
 import java.nio.BufferOverflowException;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.logging.Level;
 import org.lwjgl.BufferUtils;
@@ -120,6 +121,8 @@ final class GameRenderer implements GameStateListener {
         glDisable(GL_DITHER);
         glDisable(GL_LIGHTING);
         
+        glLineWidth(2.f);
+        
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         glClearColor(0.929f, 0.929f, 0.929f, 0.0f);
     }
@@ -157,28 +160,28 @@ final class GameRenderer implements GameStateListener {
         
         if (state.isBlockSelected()) {
             Vector selectedBlock = state.getSelectedBlock();
-
+System.out.println("hi");
             glBegin(GL_LINE_STRIP);
             glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z);
             glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z);
             glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z);
             glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z);
             glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z);
-            glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z-1);
-            glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z-1);
-            glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z-1);
-            glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z-1);
-            glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z-1);
+            glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z+1);
+            glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z+1);
+            glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z+1);
+            glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z+1);
+            glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z+1);
             glEnd();
             glBegin(GL_LINES);
             glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z);
-            glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z-1);
+            glVertex3f(selectedBlock.x, selectedBlock.y+1, selectedBlock.z+1);
 
             glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z);
-            glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z-1);
+            glVertex3f(selectedBlock.x+1, selectedBlock.y+1, selectedBlock.z+1);
 
             glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z);
-            glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z-1);
+            glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z+1);
             glEnd();
         }
         
@@ -300,42 +303,42 @@ final class GameRenderer implements GameStateListener {
      */
     private int[] cubeData(int x, int y, int z) {
         return new int[]{ // 23*5 ints
-            x, y, z,     0, 0, // degenerate
+            x, y, z,     0, 1, // degenerate
             
-            x, y, z,     1, 0,
-            x+1,y,z,     1, 1,
-            
+            x, y, z,     0, 1,
             x,y+1,z,     0, 0,
-            x+1,y+1,z,   0, 1,
             
-            x,y+1,z-1,   1, 0,
-            x+1,y+1,z-1, 1, 1,
+            x+1,y,z,     1, 1,
+            x+1,y+1,z,   1, 0,
             
-            x,y,z-1,     0, 0,
-            x+1,y,z-1,   0, 1,
+            x+1,y,z+1,   0, 1,
+            x+1,y+1,z+1, 0, 0,
             
-            x, y, z,     1, 0,
+            x,y,z+1,     1, 1,
+            x,y+1,z+1,   1, 0,
+            
+            x, y, z,     0, 1,
+            x,y+1,z,     0, 0,
+            
+            x,y+1,z,     0, 0, // degenerate
+            x,y+1,z,     0, 1, // degenerate
+            
+            x,y+1,z,     0, 1,
+            x,y+1,z+1,   0, 0,
+            
+            x+1,y+1,z,   1, 1,
+            x+1,y+1,z+1, 1, 0,
+            
+            x+1,y+1,z+1, 0, 0, // degenerate
+            x,y,z+1,     0, 1, // degenerate
+            
+            x,y,z+1,     0, 1,
+            x, y, z,     0, 0,
+            
+            x+1,y,z+1,   1, 0,
             x+1,y,z,     1, 1,
             
-            x+1,y,z,     0, 0, // degenerate
-            x+1,y,z,     0, 0, // degenerate
-            
-            x+1,y,z,     0, 1,
-            x+1,y,z-1,   1, 1,
-            
-            x+1,y+1,z,   0, 0,
-            x+1,y+1,z-1, 1, 0,
-            
-            x+1,y+1,z-1, 0, 0, // degenerate
-            x,y+1,z-1,   0, 0, // degenerate
-            
-            x,y+1,z-1,   0, 0,
-            x,y,z-1,     0, 1,
-            
-            x,y+1,z,     1, 0,
-            x, y, z,     1, 1,
-            
-            x, y, z,     0, 0, // degenerate
+            x+1,y,z,     1, 1, // degenerate
         };
     }
 
@@ -351,8 +354,8 @@ final class GameRenderer implements GameStateListener {
         
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
-                for (int z = 0; z > -8; z--) {
-                    if (data[x][y][-z] != 0) vertexData.put(cubeData(x,y,z));
+                for (int z = 0; z < 8; z++) {
+                    if (data[x][y][z] != 0) vertexData.put(cubeData(x,y,z));
                 }
             }
         }

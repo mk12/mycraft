@@ -83,6 +83,18 @@ final class Vector {
     }
     
     /**
+     * Calculates the magnitude (length) squared of this Vector. This is less
+     * expensive to call than {@code magnitude}, because it skips the square root
+     * operation. Use this when, for example, sorting by Vector length and the
+     * actual magnitude is not required.
+     * 
+     * @return the magnitude squared
+     */
+    float magnitudeSquared() {
+        return (x*x) + (y*y) + (z*z);
+    }
+    
+    /**
      * Adds {@code vec} to this Vector by adding each component
      * separately.
      * 
