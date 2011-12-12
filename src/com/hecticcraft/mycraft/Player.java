@@ -60,6 +60,9 @@ public class Player {
      */
     private static final float CAMERA_HEIGHT = 1.5f;
     
+    Block selectedBlock;
+    private Block newBlock;
+    
     private float ground = 0;
     private boolean isJumping = false;
     private float yPosition = 0;
@@ -131,6 +134,7 @@ public class Player {
             
         }
     }
+    
     
     /*
      * Vector position = player.getCamera().getWorldPosition();
