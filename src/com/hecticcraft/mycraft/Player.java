@@ -97,16 +97,16 @@ public class Player {
             camera.strafeRight(MOVE_SPEED * multiplier);
         }
         
+        // Orient the camera
+        camera.pitch(input.lookDeltaY);
+        camera.yaw(input.lookDeltaX);
+        
         // Boundaries
         Vector position = camera.getWorldPosition();
         if (position.x < 0) position.x = 0;
         else if (position.x > 8) position.x = 8;
         if (position.z > 0) position.z = 0;
         else if (position.z < -8) position.z = -8;
-        
-        // Orient the camera
-        camera.pitch(input.lookDeltaY);
-        camera.yaw(input.lookDeltaX);
         
         // Jumping
         if (input.jump && !isJumping) {
@@ -126,7 +126,33 @@ public class Player {
             
             camera.setPositionY(yPosition+CAMERA_HEIGHT);
         }
+        
+        if (input.placeBlock) {
+            
+        }
     }
+    
+    /*
+     * Vector position = player.getCamera().getWorldPosition();
+        Vector sight = player.getCamera().getWorldSight();
+        Vector step;
+        
+        // XY plane (front and back faces)
+        if (sight.z != 0) {
+            Vector frontBack = position.plus(sight.scaled(((int)Math.round(position.z) - position.z) / sight.z));
+            step = sight.scaled(Math.abs(1.f / sight.z));
+
+            while (frontBack.isInsideSquarePrism(0, 8, 0, 8, -8, 0) && frontBack.minus(position).magnitude() < Player.ARM_LENGTH) {
+                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z) != 0) {
+                    chunk.setBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1, (byte)1);
+                    listener.gameStateChunkChanged(chunk);
+                    break;
+                }
+                frontBack.add(step);
+            }
+        }
+     */
+    
     
     /**
      * Gets this Player's Camera object.

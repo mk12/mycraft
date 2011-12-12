@@ -43,6 +43,8 @@ final class GameState {
      */
     private Player player = new Player();
     
+    private boolean isBlockSelected;
+    
     private Chunk chunk;
     
     /**
@@ -70,10 +72,7 @@ final class GameState {
         
         player.update(input, multiplier);
         
-        // playerinputdata contain stateinputdata?
-        if (input.placeBlock) {
-            placeBlock();
-        }
+        
     }
     
     /** PROBLEM: camera class in state, but uses RHS system 
@@ -84,25 +83,12 @@ final class GameState {
      isolate rendering and state (camera .. ) 
      player position and camera position ? **/
     
-    private void placeBlock() {
-        Vector position = player.getCamera().getWorldPosition();
-        Vector sight = player.getCamera().getWorldSight();
-        Vector step;
-        
-        // XY plane (front and back faces)
-        if (sight.z != 0) {
-            Vector frontBack = position.plus(sight.scaled(((int)Math.round(position.z) - position.z) / sight.z));
-            step = sight.scaled(Math.abs(1.f / sight.z));
-
-            while (frontBack.isInsideSquarePrism(0, 8, 0, 8, -8, 0) && frontBack.minus(position).magnitude() < Player.ARM_LENGTH) {
-                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z) != 0) {
-                    chunk.setBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1, (byte)1);
-                    listener.gameStateChunkChanged(chunk);
-                    break;
-                }
-                frontBack.add(step);
-            }
-        }
+    boolean isBlockSelected() {
+        return true;
+    }
+    
+    Block getSelectedBlock() {
+        return new Block(0, 0, 0);
     }
     
     /**

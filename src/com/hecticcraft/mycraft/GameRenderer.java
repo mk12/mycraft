@@ -153,7 +153,7 @@ final class GameRenderer implements GameStateListener {
         // Start at 1 to avoid drawing 1st degenerate and messing everything else up
         glDrawArrays(GL_TRIANGLE_STRIP, 1, numVerts);
         
-        Vector selectedBlock = new Vector(); //state.getSelectedBlock();
+        Block selectedBlock = state.getSelectedBlock(); //state.getSelectedBlock();
         glColor3b((byte)-127, (byte)-127, (byte)-127);
         glBegin(GL_LINE_STRIP);
         glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z);

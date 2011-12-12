@@ -42,6 +42,10 @@ public class Block {
         this.z = z;
     }
     
+    void setType(Chunk chunk, byte type) {
+        chunk.getData()[x][y][z] = type;
+    }
+    
     byte getType(Chunk chunk) {
         return chunk.getData()[x][y][z];
     }
