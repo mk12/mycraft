@@ -29,7 +29,6 @@ package com.hecticcraft.mycraft;
 
 import java.io.IOException;
 import java.nio.BufferOverflowException;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.logging.Level;
 import org.lwjgl.BufferUtils;
@@ -78,8 +77,14 @@ final class GameRenderer implements GameStateListener {
      */
     private int bufferObjectID;
     
+    /**
+     * A simple 16 by 16 dirt texture.
+     */
     private Texture dirtTexture;
     
+    /**
+     * The number of vertices last uploaded to the VBO.
+     */
     private int numVerts;
     
     /**
@@ -160,7 +165,7 @@ final class GameRenderer implements GameStateListener {
         
         if (state.isBlockSelected()) {
             Vector selectedBlock = state.getSelectedBlock();
-System.out.println("hi");
+            
             glBegin(GL_LINE_STRIP);
             glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z);
             glVertex3f(selectedBlock.x+1, selectedBlock.y, selectedBlock.z);
@@ -232,59 +237,8 @@ System.out.println("hi");
         final int texcoords = 2;
         final int sizeOfInt = 4; // 4 bytes in an int
         final int vertexDataSize = (position + texcoords) * sizeOfInt;
-        
-        /*
-        final int data[] = { // 30 vertices
-            // Ground
-            0, 0, 0,     0, 0,
-            100,0,0,     100, 0,
-            0,0,-100,    0, 100,
-            100,0,-100,  100, 100,
-
-            // Cube
-            0, 0, 0,     0, 0, // degenerate
-            0, 0, 0,     0, 0, // degenerate
-
-            0, 0, 0,     1, 0,
-            1, 0, 0,     1, 1,
-
-            0, 1, 0,     0, 0,
-            1, 1, 0,     0, 1,
-
-            0, 1,-1,     1, 0,
-            1, 1,-1,     1, 1,
-
-            0, 0,-1,     0, 0,
-            1, 0,-1,     0, 1,
-
-            0, 0, 0,     1, 0,
-            1, 0, 0,     1, 1,
-
-            1, 0, 0,     0, 0, // degenerate
-            1, 0, 0,     0, 0, // degenerate
-
-            1, 0, 0,     0, 1,
-            1, 0,-1,     1, 1,
-
-            1, 1, 0,     0, 0,
-            1, 1,-1,     1, 0,
-
-            1, 1,-1,     0, 0, // degenerate
-            0, 1,-1,     0, 0, // degenerate
-
-            0, 1,-1,     0, 0,
-            0, 0,-1,     0, 1,
-
-            0, 1, 0,     1, 0,
-            0, 0, 0,     1, 1,
-        };
-
-        IntBuffer dataBuffer = BufferUtils.createIntBuffer(30*vertexDataSize);
-        dataBuffer.put(data);
-        dataBuffer.flip();*/
 
         ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, bufferObjectID);
-        //ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, dataBuffer, ARBVertexBufferObject.GL_DYNAMIC_DRAW_ARB);
 
         glVertexPointer(3, GL_INT, vertexDataSize, 0);
         glTexCoordPointer(2, GL_INT, vertexDataSize, position*sizeOfInt);

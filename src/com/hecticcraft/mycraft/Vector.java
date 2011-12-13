@@ -230,10 +230,13 @@ final class Vector {
                           nAxis.z*(nAxis.x*vec.x + nAxis.y*vec.y + nAxis.z*vec.z)*(1.f-c) + vec.z*c + (-nAxis.y*vec.x + nAxis.x*vec.y)*s);
     }
     
+    // get rid of this
     /**
      * Determines if this coordinate represented by this Vector (assuming the Vector
      * is placed at the origin) is contained by the square prism defined by the
      * corner vertices ({@code x1}, {@code y1}, {@code z1}) and ({@code x2}, {@code y2}, {@code z2}).
+     * 
+     * Note: Lower bounds are inclusive, upper bounds are exclusive.
      * 
      * @param x1 the X-coordinate of the first corner vertex
      * @param x2 the X-coordinate of the second corner vertex
@@ -244,6 +247,6 @@ final class Vector {
      * @return true if the the head of this vector is inside the given square prism
      */
     boolean isInsideSquarePrism(float x1, float x2, float y1, float y2, float z1, float z2) {
-        return (x >= x1 && x <= x2 && y >= y1 && y <= y2 && z >= z1 && z <= z2);
+        return (x >= x1 && x < x2 && y >= y1 && y < y2 && z > z1 && z <= z2);
     }
 }

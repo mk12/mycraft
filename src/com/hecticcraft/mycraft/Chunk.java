@@ -62,20 +62,6 @@ final class Chunk {
         data[2][0][2] = 1;
     }
     
-    void setNeighbourBlockType(Direction direction, int x, int y, int z, byte type) {
-        switch (direction) {
-            
-        }
-    }
-    
-    void setBlockType(int x, int y, int z, byte type) {
-        data[x][y][-z] = type; // why negative z when this is state calling?
-    }
-    
-    byte getBlockType(int x, int y, int z) {
-        return data[x][y][-z];
-    }
-    
     byte[][][] getData() {
         return data;
     }

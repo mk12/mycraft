@@ -28,11 +28,12 @@
 package com.hecticcraft.mycraft;
 
 /**
- *
+ * Block represents a single block in the MyCraft world. It stores its
+ * coordinates internally in world space.
+ * 
  * @author Mitchell Kember
  */
 public class Block {
-    // store as world
     int x;
     int y;
     int z;
@@ -41,6 +42,14 @@ public class Block {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+    
+    static Block fromWorld(int x, int y, int z) {
+        return new Block(x, y, z);
+    }
+    
+    static Block fromOpenGL(int x, int y, int z) {
+        return new Block(x, y, -z);
     }
     
     void setType(Chunk chunk, byte type) {
@@ -57,13 +66,5 @@ public class Block {
     
     Vector getOpenGLCoordinates() {
         return new Vector(x, y, -z);
-    }
-    
-    static Block fromWorld(int x, int y, int z) {
-        return new Block(x, y, z);
-    }
-    
-    static Block fromOpenGL(int x, int y, int z) {
-        return new Block(x, y, -z);
     }
 }

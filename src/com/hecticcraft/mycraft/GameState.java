@@ -36,7 +36,7 @@ package com.hecticcraft.mycraft;
  */
 final class GameState {
     
-    private static final float ARM_LENGTH_SQUARED = 25;
+    private static final float ARM_LENGTH_SQUARED = 6*6;
     
     /**
      * The object which listens to state changes (usually the renderer).
@@ -87,7 +87,7 @@ final class GameState {
         
         calculateSelectedBlock(chunk);
         
-        if (input.placeBlock && isBlockSelected) {
+        if (input.placeBlock && isBlockSelected && newBlock != null) {
             newBlock.setType(chunk, (byte)1);
             listener.gameStateChunkChanged(chunk);
         }
@@ -100,21 +100,41 @@ final class GameState {
         Vector step;
         
         // XY plane (front and back faces)
-        float frontBackDistSquared = -1;
+        float frontBackDistSquared = Float.MAX_VALUE;
         if (sight.z != 0) {
-            frontBack = position.plus(sight.scaled(((int)Math.round(position.z) - position.z) / sight.z));
+            if (sight.z < 0) frontBack = position.plus(sight.scaled((float)(Math.ceil(position.z) - position.z) / sight.z));
+            else frontBack = position.plus(sight.scaled((float)(Math.floor(position.z) - position.z) / sight.z));
             step = sight.scaled(Math.abs(1.f / sight.z));
             
-            while (frontBack.isInsideSquarePrism(0, 7, 0, 7, -7, 0) && frontBack.minus(position).magnitudeSquared() < ARM_LENGTH_SQUARED) {
+            while (frontBack.x >= 0 && frontBack.x < 8
+                    && frontBack.y >= 0 && frontBack.y < 8
+                    && frontBack.z > -8 && frontBack.z <= 0) {
                 float distSquared = frontBack.minus(position).magnitudeSquared();
                 if (distSquared > ARM_LENGTH_SQUARED) break;
                 
-                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z) != 0) {
-                    selectedBlock = Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z);
-                    newBlock = Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1);
-                    frontBackDistSquared = distSquared;
-                    isBlockSelected = true;
-                    return;
+                if (sight.z < 0) {
+                     if (Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z).getType(chunk) != 0) {
+                         selectedBlock = Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z);
+                         newBlock = Block.fromWorld(selectedBlock.x, selectedBlock.y, selectedBlock.z-1); // make sure its air
+                         if (newBlock.getType(chunk) != 0) newBlock = null;
+                         
+                         frontBackDistSquared = distSquared;
+                         isBlockSelected = true;
+                         return;
+                     }
+                } else {
+                    if (-(frontBack.z+1) >= 0 && Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1).getType(chunk) != 0) {
+                        selectedBlock = Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1);
+                        if (selectedBlock.z+1 >= 8) newBlock = null;
+                        else {
+                            newBlock = Block.fromWorld(selectedBlock.x, selectedBlock.y, selectedBlock.z+1);
+                            if (newBlock.getType(chunk) != 0) newBlock = null;
+                        }
+                        
+                        frontBackDistSquared = distSquared;
+                        isBlockSelected = true;
+                        return;
+                    }
                 }
                 frontBack.add(step);
             }
@@ -129,29 +149,17 @@ final class GameState {
      borderline chunks
      playerv vs gamestate responsibility
      isolate rendering and state (camera .. ) 
-     player position and camera position ? **/
+     player position and camera position ?
+     * 
+     * http://www.matrix44.net/cms/notes/opengl-3d-graphics/coordinate-systems-in-opengl
+     
+     **/
     
-    /*
-     * Vector position = player.getCamera().getWorldPosition();
-        Vector sight = player.getCamera().getWorldSight();
-        Vector step;
-        
-        // XY plane (front and back faces)
-        if (sight.z != 0) {
-            Vector frontBack = position.plus(sight.scaled(((int)Math.round(position.z) - position.z) / sight.z));
-            step = sight.scaled(Math.abs(1.f / sight.z));
-
-            while (frontBack.isInsideSquarePrism(0, 8, 0, 8, -8, 0) && frontBack.minus(position).magnitude() < Player.ARM_LENGTH) {
-                if (chunk.getBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z) != 0) {
-                    chunk.setBlockType((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1, (byte)1);
-                    listener.gameStateChunkChanged(chunk);
-                    break;
-                }
-                frontBack.add(step);
-            }
-        }
+    /**
+     * Determines whether a block is currently selected or not.
+     * 
+     * @return 
      */
-    
     boolean isBlockSelected() {
         return isBlockSelected;
     }
