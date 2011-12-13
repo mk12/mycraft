@@ -36,7 +36,7 @@ package com.hecticcraft.mycraft;
  */
 final class GameState {
     
-    private static final float ARM_LENGTH_SQUARED = 6*6;
+    private static final float ARM_LENGTH_SQUARED = 7*7;
     
     /**
      * The object which listens to state changes (usually the renderer).
