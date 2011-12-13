@@ -27,15 +27,6 @@
 
 package com.hecticcraft.mycraft;
 
-enum Direction {
-    FRONT,
-    BEHIND,
-    ABOVE,
-    BELOW,
-    LEFT,
-    RIGHT
-}
-
 /**
  * Chunk represents a chunk of 8 by 8 by 8 blocks in the MyCraft world.
  * Each block uses one byte to represent its type, totaling 512 bytes to
@@ -46,10 +37,17 @@ enum Direction {
  */
 final class Chunk {
     
-    // only recalculate connectivity, create new vbo when block changes
-    // negative Z ??
+    /**
+     * Not used yet since there is only one Chunk.
+     */
     private Vector position;
     
+    /**
+     * This 3D array stores all the types of the blocks in this Chunk. It is in
+     * the following format:
+     * 
+     * {@code data[x][y][z]}
+     */
     private byte[][][] data = new byte[8][8][8];
     
     {
@@ -62,7 +60,25 @@ final class Chunk {
         data[2][0][2] = 1;
     }
     
+    /**
+     * Gets this Chunk's data.
+     * 
+     * @return the data
+     */
     byte[][][] getData() {
         return data;
+    }
+    
+    /**
+     * 
+     * @param block
+     * @param type 
+     */
+    void setBlockType(Block block, byte type) {
+        data[block.x][block.y][block.z] = type;
+    }
+    
+    byte getBlockType(Block block) {
+        return data[block.x][block.y][block.z];
     }
 }

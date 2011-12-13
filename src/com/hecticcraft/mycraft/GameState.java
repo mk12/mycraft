@@ -28,15 +28,20 @@
 package com.hecticcraft.mycraft;
 
 /**
- * GameState is responsible for simulating the MyCraft world. It alone does no
- * rendering, it simply stores data about the Player and the blocks.
+ * GameState is the model in the Model-View-Controller (MVC) design architecture
+ * for this application. GameState is responsible for simulating the MyCraft world.
+ * It is a snapshot of a MyCraft world at any given time.
  * 
  * @author Mitchell Kember
  * @since 07/12/2011
  */
 final class GameState {
     
-    private static final float ARM_LENGTH_SQUARED = 6*6;
+    /**
+     * The length of the Player's arm; how far away from the Player a block
+     * can be placed.
+     */
+    private static final float ARM_LENGTH = 6;
     
     /**
      * The object which listens to state changes (usually the renderer).
@@ -53,8 +58,15 @@ final class GameState {
      */
     private Chunk chunk;
     
-    private boolean isBlockSelected;
+    /**
+     * The currently selected block.
+     */
     private Block selectedBlock;
+    
+    /**
+     * The block of air which will be replaced with a solid block if the Player
+     * chooses to.
+     */
     private Block newBlock;
     
     /**
@@ -86,11 +98,11 @@ final class GameState {
         player.updateHeight(multiplier);
         
         calculateSelectedBlock(chunk);
-        /*
-        if (input.placeBlock && isBlockSelected && newBlock != null) { // won't need newBlock==null when all faces are detected
-            newBlock.setType(chunk, (byte)1);
+        
+        if (input.placeBlock && selectedBlock != null && newBlock != null) { // won't need newBlock==null when all faces are detected
+            chunk.setBlockType(newBlock, (byte)1);
             listener.gameStateChunkChanged(chunk);
-        }*/
+        }
     }
     
     void calculateSelectedBlock(Chunk chunk) {
@@ -99,48 +111,48 @@ final class GameState {
         Vector frontBack;
         Vector step;
         
+        selectedBlock = null;
+        newBlock = null;
+        
         // XY plane (front and back faces)
         float frontBackDistSquared = Float.MAX_VALUE;
         if (sight.z != 0) {
-            if (sight.z < 0) frontBack = position.plus(sight.scaled((float)(Math.ceil(position.z) - position.z) / sight.z));
+            if (sight.z > 0) frontBack = position.plus(sight.scaled((float)(Math.ceil(position.z) - position.z) / sight.z));
             else frontBack = position.plus(sight.scaled((float)(Math.floor(position.z) - position.z) / sight.z));
             step = sight.scaled(Math.abs(1.f / sight.z));
             
             while (frontBack.x >= 0 && frontBack.x < 8
                     && frontBack.y >= 0 && frontBack.y < 8
-                    && frontBack.z > -8 && frontBack.z <= 0) {
+                    && frontBack.z >= 0 && frontBack.z < 8) {
                 float distSquared = frontBack.minus(position).magnitudeSquared();
-                if (distSquared > ARM_LENGTH_SQUARED) break;
+                if (distSquared > ARM_LENGTH * ARM_LENGTH) break;
                 
-                if (sight.z < 0) {
-                     if (Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z).getType(chunk) != 0) {
-                         selectedBlock = Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z);
-                         newBlock = Block.fromWorld(selectedBlock.x, selectedBlock.y, selectedBlock.z-1); // make sure its air
-                         if (newBlock.getType(chunk) != 0) newBlock = null;
+                if (sight.z > 0) {
+                     if (chunk.getBlockType(new Block((int)frontBack.x, (int)frontBack.y, (int)frontBack.z)) != 0) {
+                         selectedBlock = new Block((int)frontBack.x, (int)frontBack.y, (int)frontBack.z);
+                         if (selectedBlock.z-1 >= 0) {
+                             newBlock = new Block(selectedBlock.x, selectedBlock.y, selectedBlock.z-1); // make sure its air
+                             if (chunk.getBlockType(newBlock) != 0) newBlock = null;
+                         }
                          
                          frontBackDistSquared = distSquared;
-                         isBlockSelected = true;
-                         return;
+                         break;
                      }
                 } else {
-                    if (-(frontBack.z+1) >= 0 && Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1).getType(chunk) != 0) {
-                        selectedBlock = Block.fromOpenGL((int)frontBack.x, (int)frontBack.y, (int)frontBack.z+1);
-                        if (selectedBlock.z+1 >= 8) newBlock = null;
-                        else {
-                            newBlock = Block.fromWorld(selectedBlock.x, selectedBlock.y, selectedBlock.z+1);
-                            if (newBlock.getType(chunk) != 0) newBlock = null;
+                    if (frontBack.z-1 >= 0 && chunk.getBlockType(new Block((int)frontBack.x, (int)frontBack.y, (int)frontBack.z-1)) != 0) {
+                        selectedBlock = new Block((int)frontBack.x, (int)frontBack.y, (int)frontBack.z-1);
+                        if (selectedBlock.z+1 < 8) {
+                            newBlock = new Block(selectedBlock.x, selectedBlock.y, selectedBlock.z+1);
+                            if (chunk.getBlockType(newBlock) != 0) newBlock = null;
                         }
                         
                         frontBackDistSquared = distSquared;
-                        isBlockSelected = true;
-                        return;
+                        break;
                     }
                 }
                 frontBack.add(step);
             }
         }
-        
-        isBlockSelected = false;
     }
     
     /** PROBLEM: camera class in state, but uses RHS system 
@@ -151,6 +163,7 @@ final class GameState {
      isolate rendering and state (camera .. ) 
      player position and camera position ?
      * 
+     * cant place blocks when at back corner (z=8 in state)
      * http://www.matrix44.net/cms/notes/opengl-3d-graphics/coordinate-systems-in-opengl
      
      **/
@@ -161,11 +174,15 @@ final class GameState {
      * @return 
      */
     boolean isBlockSelected() {
-        return isBlockSelected;
+        return selectedBlock != null;
     }
     
-    Vector getSelectedBlock() {
-        return selectedBlock.getOpenGLCoordinates();
+    /**
+     * 
+     * @return 
+     */
+    Block getSelectedBlock() {
+        return selectedBlock;
     }
     
     /**

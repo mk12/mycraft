@@ -230,6 +230,11 @@ final class Vector {
                           nAxis.z*(nAxis.x*vec.x + nAxis.y*vec.y + nAxis.z*vec.z)*(1.f-c) + vec.z*c + (-nAxis.y*vec.x + nAxis.x*vec.y)*s);
     }
     
+    /**
+     * Returns a new Vector with the z axis inverted.
+     * 
+     * @return the Vector
+     */
     Vector invertedZ() {
         return new Vector(x, y, -z);
     }

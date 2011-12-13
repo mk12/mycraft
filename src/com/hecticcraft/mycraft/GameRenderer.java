@@ -87,6 +87,10 @@ final class GameRenderer implements GameStateListener {
      */
     private int numVerts;
     
+    static Vector openGLCoordinatesForBlock(Block block) {
+        return new Vector(block.x, block.y, -block.z);
+    }
+    
     /**
      * Creates a new GameRenderer and sets up the LWJGL window.
      * 
@@ -129,7 +133,7 @@ final class GameRenderer implements GameStateListener {
         glLineWidth(2.f);
         
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-        glClearColor(0.929f, 0.929f, 0.929f, 0.0f);
+        glClearColor(0.8f, 0.9f, 1.f, 0.0f);
     }
     
     /**
@@ -164,7 +168,7 @@ final class GameRenderer implements GameStateListener {
         glColor3b((byte)-127, (byte)-127, (byte)-127);
         
         if (state.isBlockSelected()) {
-            Vector selectedBlock = state.getSelectedBlock();
+            Vector selectedBlock = openGLCoordinatesForBlock(state.getSelectedBlock());
             
             glBegin(GL_LINE_STRIP);
             glVertex3f(selectedBlock.x, selectedBlock.y, selectedBlock.z);
