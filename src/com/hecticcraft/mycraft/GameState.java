@@ -86,11 +86,11 @@ final class GameState {
         player.updateHeight(multiplier);
         
         calculateSelectedBlock(chunk);
-        
-        if (input.placeBlock && isBlockSelected && newBlock != null) {
+        /*
+        if (input.placeBlock && isBlockSelected && newBlock != null) { // won't need newBlock==null when all faces are detected
             newBlock.setType(chunk, (byte)1);
             listener.gameStateChunkChanged(chunk);
-        }
+        }*/
     }
     
     void calculateSelectedBlock(Chunk chunk) {

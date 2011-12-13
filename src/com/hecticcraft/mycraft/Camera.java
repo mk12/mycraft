@@ -91,7 +91,7 @@ final class Camera {
      * @param vec the movement Vector
      */
     void move(Vector vec) {
-        position.add(vec);
+        position.add(vec.invertedZ());
     }
     
     /**
@@ -144,6 +144,14 @@ final class Camera {
     }
     
     /**
+     * 
+     * @param x 
+     */
+    void setPositionX(float x) {
+        position.x = x;
+    }
+    
+    /**
      * Sets this Camera's position's Y-coordinate to {@code y}.
      * 
      * @param y the new position's Y-coordinate
@@ -153,18 +161,26 @@ final class Camera {
     }
     
     /**
+     * 
+     * @param z 
+     */
+    void setPositionZ(float z) {
+        position.z = -z;
+    }
+    
+    /**
      * Gets this Camera's position.
      * 
      * @return the position
      */
     Vector getPosition() {
-        return position;
+        return position.invertedZ();
     }
     
     /**
      * Gets the Vector which represents the direction this Camera is looking.
      */
     Vector getSight() {
-        return sight;
+        return sight.invertedZ();
     }
 }
