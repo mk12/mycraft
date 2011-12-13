@@ -150,7 +150,7 @@ final class GameState {
                         break;
                     }
                 }
-                frontBack.add(step);
+                    frontBack.add(step);
             }
         }
     }

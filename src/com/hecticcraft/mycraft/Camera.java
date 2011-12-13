@@ -32,12 +32,21 @@ import static org.lwjgl.util.glu.GLU.gluLookAt;
 /**
  * Camera manages a first person camera in 3D space. It calculates the necessary
  * matrix transformations to orient the camera, and provides a simplified
- * mechanism for moving the camera via movement and rotation methods. It makes
+ * mechanism for orienting the camera via movement and rotation methods. It makes
  * heavy use of the Vector class.
- * 
- * Camera is meant to be used with a left-handed system, however internally
- * all data is stored in right-handed coordinates, for use with OpenGL. This is
- * transparent to users of Camera.
+ * <p>
+ * Camera is meant to be used with OpenGL, which uses a right-handed system.
+ * Camera, however, creates a transparent layer between this and functions as
+ * if it was using a left-handed coordinate system (into the screen being
+ * positive Z rather than negative). GameState uses a left-handed system in the
+ * sense that objects only exist in positive coordinates extending forward, up
+ * and right from the origin. This is by virtue of the fact that coordinates of
+ * objects (which are integers) are simply stored as indices in a 3D array.
+ * Because Camera's methods cater to the state's system, Camera is a part of the
+ * model (MVC), not the view. This decision was made through the logic that
+ * Camera represents a property of the Player (its view) rather than an aspect
+ * of rendering. Internally, however, Camera is more of a mix of the model and
+ * the view.
  * 
  * @author Mitchell Kember
  * @since 08/12/2011
@@ -57,7 +66,8 @@ final class Camera {
     private static final Vector sky = new Vector(0, 1, 0);
     
     /**
-     * The position, stored internally in world coordinates.
+     * The position, stored internally in OpenGL/right-handed coordinates. That is,
+     * movement actions will change the Z-coordinate of {@code position} inversely.
      */
     private Vector position = new Vector(0, 0, 0);
     
@@ -69,22 +79,29 @@ final class Camera {
     /**
      * The view or sight of this Camera, as a normalized Vector relative to
      * this Camera's position.
+     * 
+     * @see #position
      */
     private Vector sight = new Vector(0, 0, -1);
     
     /**
      * Keeps track of this Camera's pitch, used to avoid pitching below
      * -90 degrees or above +90 degrees.
+     * 
+     * @see #pitch
      */
     private float rotationX = 0;
     
     /**
      * Updates the OpenGL ModelView matrix stack for this Camera's view.
-     * Call after all Camera transformations and before rendering.
+     * Call after all Camera transformations and before rendering. It is
+     * assumed that the identity matrix has been loaded.
      */
     void updateMatrix() {
+        // Get the absolute coordinate of the view direction
         Vector lookAt = position.plus(sight);
         
+        // Multiply onto the matrix stack
         gluLookAt((float)position.x,(float)position.y,  (float)position.z,
                   (float)lookAt.x,  (float)lookAt.y,    (float)lookAt.z,
                   (float)sky.x,     (float)sky.y,       (float)sky.z);
@@ -129,7 +146,8 @@ final class Camera {
      */
     void pitch(float angle) {
         if (rotationX + angle < -89.9f || rotationX + angle > 89.9f) return;
-        rotationX += angle;
+        rotationX += angle; // keep track of angle
+        
         sight = Vector.axisRotation(sight, right, angle*DEG_TO_RAD);
     }
     
@@ -176,7 +194,7 @@ final class Camera {
     }
     
     /**
-     * Gets this Camera's position.
+     * Gets a copy of this Camera's position.
      * 
      * @return the position
      */
@@ -185,7 +203,7 @@ final class Camera {
     }
     
     /**
-     * Gets the Vector which represents the direction this Camera is looking.
+     * Gets a copy of the Vector which represents the direction of this Camera's line of sight.
      */
     Vector getSight() {
         return sight.invertedZ();

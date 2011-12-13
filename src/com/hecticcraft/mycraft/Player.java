@@ -46,7 +46,7 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
     /**
      * Speed in units per 60 FPS frame for this Player's movement.
      */
-    private static final float MOVE_SPEED = 0.1f;
+    private static final float MOVE_SPEED = 0.075f;
     
     /**
      * The pull of gravity, in units per 60 FPS frame.
@@ -87,7 +87,6 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
     
     {
         camera.setPositionY(height+CAMERA_HEIGHT);
-        //camera.move(new Vector(0, height+CAMERA_HEIGHT, 0));
     }
     
     /**
@@ -113,6 +112,26 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
         else if (position.x > 8) camera.setPositionX(8);
         if (position.z < 0) camera.setPositionZ(0);
         else if (position.z > 8) camera.setPositionZ(8);
+        
+        Vector sight = camera.getSight();
+        
+        if (sight.x > 0) {
+            if (chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT), (int)(position.z-0.25f))) != 0
+                    || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT), (int)(position.z+0.25f))) != 0
+                    || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z-0.25f))) != 0
+                    || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z+0.25f))) != 0) {
+                camera.setPositionX((int)Math.round(position.x) - 0.5f);
+            }
+        } else {
+            if ((int)Math.round(position.x)-1 >= 0 &&
+                    (chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT), (int)(position.z-0.25f))) != 0
+                    || chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT), (int)(position.z+0.25f))) != 0
+                    || chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z-0.25f))) != 0
+                    || chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z+0.25f))) != 0)) {
+                camera.setPositionX((int)Math.round(position.x) + 0.5f);
+            }
+        }
+        // request adjacent chunk...
     }
     
     /**

@@ -144,7 +144,7 @@ final class GameRenderer implements GameStateListener {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(45, (float)DISPLAY_WIDTH / (float)DISPLAY_HEIGHT, 1.f, renderDistance);
+        gluPerspective(45, (float)DISPLAY_WIDTH / (float)DISPLAY_HEIGHT, 0.5f, renderDistance);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
