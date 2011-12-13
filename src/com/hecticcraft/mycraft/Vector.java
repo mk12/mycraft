@@ -28,9 +28,9 @@
 package com.hecticcraft.mycraft;
 
 /**
- * Vector represents a simple three-dimensional vector. In particular, it provides
- * counterparts to most normal methods, returning a new vector rather than modifying
- * an existing one (e.g. add/plus, sub/minus, scale/scaled). It also provides a
+ * Vector represents a three-dimensional (3D) vector. In particular, it provides
+ * two of most operations, one mutating the current Vector and another returning
+ * a new one (e.g. add/plus, sub/minus, scale/scaled). It also provides a
  * convenient method for axis rotations.
  *
  * @author Mitchell Kember
@@ -211,7 +211,7 @@ final class Vector {
     }
     
     /**
-     * Rotates {@code vec} about an arbitrary axis {@code axis} by {@code angle}
+     * Rotates {@code vec} about an arbitrary {@code axis} by {@code angle}
      * radians. This does not modify {@code vec}.
      * 
      * @param vec the Vector to rotate
@@ -231,7 +231,8 @@ final class Vector {
     }
     
     /**
-     * Returns a new Vector with the z axis inverted.
+     * Returns a copy of this Vector with its Z-axis inverted. Useful for converting
+     * between a left-handed system and a right-handed system.
      * 
      * @return the Vector
      */
