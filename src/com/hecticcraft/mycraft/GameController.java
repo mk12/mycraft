@@ -45,9 +45,10 @@ enum MouseButton {
 }
 
 /**
- * GameController is the main controller in the Model-View-Controller (MVC)
- * design architecture for this application. It handles user input and mediates
- * between the GameState and GameRenderer classes.
+ * GameController is the controller in the Model-View-Controller (MVC) design
+ * architecture for this application. GameController handles user input and mediates
+ * between the GameState and GameRenderer classes. It also manages the run loop
+ * of MyCraft.
  * 
  * @author Mitchell Kember
  * @since 07/12/2011
@@ -135,8 +136,11 @@ final class GameController {
      * @return true if it is down and it wasn't last time this method was called
      */
     private boolean wasMouseClicked(MouseButton button) {
+        // Check if the specified button is down
         boolean buttonDown = Mouse.isButtonDown(button.ordinal());
-        boolean clicked = (wasMouseButtonDown != buttonDown) && buttonDown;
+        // Check if it is was up before and down now
+        boolean clicked = !wasMouseButtonDown && buttonDown;
+        // New becomes old for next call
         wasMouseButtonDown = buttonDown;
         
         return clicked;
@@ -149,7 +153,7 @@ final class GameController {
     void run() {
         while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             if (Display.isVisible()) {
-                
+                // Update the state with the required input
                 state.update(new GameStateInputData(
                         Keyboard.isKeyDown(Keyboard.KEY_W),
                         Keyboard.isKeyDown(Keyboard.KEY_S),
@@ -160,12 +164,16 @@ final class GameController {
                         wasMouseClicked(MouseButton.RIGHT)),
                         getDeltaTime());
                 
+                // Render it
                 renderer.render(state);
             } else {
+                // Only render if it needs rendering
                 if (Display.isDirty()) {
                     renderer.render(state);
                 }
                 try {
+                    // If the window isn't visible, sleep a bit so that we're
+                    // not wasting resources by checking nonstop.
                     Thread.sleep(100);
                 } catch (InterruptedException e) { }
             }

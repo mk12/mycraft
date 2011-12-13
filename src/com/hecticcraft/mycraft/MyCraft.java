@@ -80,6 +80,7 @@ final class MyCraft {
             System.out.println("NOOO");
         } finally {
             if (controller != null) {
+                // Clean up
                 controller.destroy();
             }
         }
