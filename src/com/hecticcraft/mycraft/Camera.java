@@ -35,6 +35,10 @@ import static org.lwjgl.util.glu.GLU.gluLookAt;
  * mechanism for moving the camera via movement and rotation methods. It makes
  * heavy use of the Vector class.
  * 
+ * Camera is meant to be used with a left-handed system, however internally
+ * all data is stored in right-handed coordinates, for use with OpenGL. This is
+ * transparent to users of Camera.
+ * 
  * @author Mitchell Kember
  * @since 08/12/2011
  * @see Vector
@@ -53,7 +57,7 @@ final class Camera {
     private static final Vector sky = new Vector(0, 1, 0);
     
     /**
-     * The position, in global coordinates.
+     * The position, stored internally in world coordinates.
      */
     private Vector position = new Vector(0, 0, 0);
     
@@ -63,7 +67,8 @@ final class Camera {
     private Vector right = new Vector(1, 0, 0);
     
     /**
-     * The location this Camera is looking at, relative to this Camera.
+     * The view or sight of this Camera, as a normalized Vector relative to
+     * this Camera's position.
      */
     private Vector sight = new Vector(0, 0, -1);
     
@@ -74,8 +79,8 @@ final class Camera {
     private float rotationX = 0;
     
     /**
-     * Updates the OpenGL matrix stack for this Camera's view. Call after
-     * any Camera transformations, before rendering.
+     * Updates the OpenGL ModelView matrix stack for this Camera's view.
+     * Call after all Camera transformations and before rendering.
      */
     void updateMatrix() {
         Vector lookAt = position.plus(sight);
@@ -91,7 +96,7 @@ final class Camera {
      * @param vec the movement Vector
      */
     void move(Vector vec) {
-        position.add(vec);
+        position.add(vec.invertedZ());
     }
     
     /**
@@ -144,6 +149,15 @@ final class Camera {
     }
     
     /**
+     * Sets this Camera's position's X-coordinate to {@code x}.
+     * 
+     * @param x the new position's X-coordinate
+     */
+    void setPositionX(float x) {
+        position.x = x;
+    }
+    
+    /**
      * Sets this Camera's position's Y-coordinate to {@code y}.
      * 
      * @param y the new position's Y-coordinate
@@ -153,18 +167,27 @@ final class Camera {
     }
     
     /**
+     * Sets this Camera's position's Z-coordinate to {@code z}.
+     * 
+     * @param z the new position's Z-coordinate
+     */
+    void setPositionZ(float z) {
+        position.z = -z;
+    }
+    
+    /**
      * Gets this Camera's position.
      * 
      * @return the position
      */
     Vector getPosition() {
-        return position;
+        return position.invertedZ();
     }
     
     /**
      * Gets the Vector which represents the direction this Camera is looking.
      */
     Vector getSight() {
-        return sight;
+        return sight.invertedZ();
     }
 }

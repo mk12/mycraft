@@ -150,9 +150,6 @@ final class GameController {
         while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             if (Display.isVisible()) {
                 
-                //processKeyboard();
-                //processMouse();
-                
                 state.update(new GameStateInputData(
                         Keyboard.isKeyDown(Keyboard.KEY_W),
                         Keyboard.isKeyDown(Keyboard.KEY_S),
@@ -173,13 +170,5 @@ final class GameController {
                 } catch (InterruptedException e) { }
             }
         }
-    }
-    
-    private void processKeyboard() {
-        // UI/HUD stuff
-    }
-    
-    private void processMouse() {
-        // UI/HUD stuff
     }
 }

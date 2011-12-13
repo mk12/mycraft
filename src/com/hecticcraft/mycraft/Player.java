@@ -86,7 +86,8 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
     private Camera camera = new Camera();
     
     {
-        camera.move(new Vector(0, height+CAMERA_HEIGHT, 0));
+        camera.setPositionY(height+CAMERA_HEIGHT);
+        //camera.move(new Vector(0, height+CAMERA_HEIGHT, 0));
     }
     
     /**
@@ -108,10 +109,10 @@ public class Player {/****** GROUND/isjumping not needed, testing every frame if
     void collision(Chunk chunk) {
         // Boundaries
         Vector position = camera.getPosition();
-        if (position.x < 0) position.x = 0;
-        else if (position.x > 8) position.x = 8;
-        if (position.z > 0) position.z = 0;
-        else if (position.z < -8) position.z = -8;
+        if (position.x < 0) camera.setPositionX(0);
+        else if (position.x > 8) camera.setPositionX(8);
+        if (position.z < 0) camera.setPositionZ(0);
+        else if (position.z > 8) camera.setPositionZ(8);
     }
     
     /**
