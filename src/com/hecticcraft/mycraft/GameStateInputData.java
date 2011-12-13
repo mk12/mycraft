@@ -28,10 +28,7 @@
 package com.hecticcraft.mycraft;
 
 /**
- * A container for input that must be handled by GameState. This creates a layer
- * of abstraction between the actual means of input (which key, which mouse button,
- * etc.) and what type of input is actual required for GameState to perform
- * specific actions.
+ * A container for input that must be handled by GameState.
  * 
  * @author Mitchell Kember
  * @since 09/12/2011
@@ -51,8 +48,6 @@ final class GameStateInputData {
     final float lookDeltaX;
     final float lookDeltaY;
     
-    final int cycleBlock;
-    
     final boolean placeBlock;
     
     /**
@@ -65,10 +60,9 @@ final class GameStateInputData {
      * @param jump if the Player should jump
      * @param lookDeltaX the distance along the x-axis the Player has shifted its gaze
      * @param lookDeltaY the distance along the y-axis the Player has shifted its gaze
-     * @param cycleBlock how many times the Player should cycle the block being held (wraps around)
      * @param placeBlock if the Player should place a block
      */
-    GameStateInputData(boolean forward, boolean backward, boolean left, boolean right, boolean jump, float lookDeltaX, float lookDeltaY, int cycleBlock, boolean placeBlock) {
+    GameStateInputData(boolean forward, boolean backward, boolean left, boolean right, boolean jump, float lookDeltaX, float lookDeltaY, boolean placeBlock) {
         this.forward = forward;
         this.backward = backward;
         this.left = left;
@@ -76,15 +70,14 @@ final class GameStateInputData {
         this.jump = jump;
         this.lookDeltaX = lookDeltaX * lookSensitivity;
         this.lookDeltaY = lookDeltaY * lookSensitivity;
-        this.cycleBlock = cycleBlock;
         this.placeBlock = placeBlock;
     }
     
     /**
-     * Changes the look sensitivity. Smaller values will cause the view to pan
-     * around more slowly; for example if the mouse is used, a very small
+     * Changes the look sensitivity. Smaller values allow looking around more
+     * accurately but more slowly; for example if the mouse is used, a very small
      * value would require lifting the mouse several times to turn around. Larger
-     * cause the view to pan around more quickly.
+     * values allow looking around very quickly.
      * 
      * @param lookSensitivity the new look sensitivity
      */
