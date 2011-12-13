@@ -160,7 +160,7 @@ final class GameController {
                         Keyboard.isKeyDown(Keyboard.KEY_A),
                         Keyboard.isKeyDown(Keyboard.KEY_D),
                         Keyboard.isKeyDown(Keyboard.KEY_SPACE),
-                        Mouse.getDX(), Mouse.getDY(),
+                        Mouse.getDX(), Mouse.getDY(), Mouse.getDWheel() / -120,
                         wasMouseClicked(MouseButton.RIGHT)),
                         getDeltaTime());
                 
