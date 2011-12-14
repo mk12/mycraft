@@ -95,7 +95,9 @@ public class Player {
      * (jumping or falling) in which case nothing happens.
      */
     void jump() {
-        if (isGrounded) {
+        if (height == ground) {
+            ground = 0;
+            height += 0.0001f;
             isGrounded = false;
             velocity = INITAL_JUMP_VELOCITY;
         }
@@ -116,22 +118,28 @@ public class Player {
         
         Vector sight = camera.getSight();
         
-        if (sight.x > 0) {
-            if (chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT), (int)(position.z-0.25f))) != 0
-                    || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT), (int)(position.z+0.25f))) != 0
-                    || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z-0.25f))) != 0
-                    || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z+0.25f))) != 0) {
-                camera.setPositionX((int)Math.round(position.x) - 0.5f);
+        // dont use sight.x, could b moving backwards (or strafing :/)
+        try {
+            if (sight.x > 0) {
+                if (chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT), (int)(position.z-0.25f))) != 0
+                        || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT), (int)(position.z+0.25f))) != 0
+                        || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z-0.25f))) != 0
+                        || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z+0.25f))) != 0) {
+                    camera.setPositionX((int)Math.round(position.x) - 0.5f);
+                }
+            } else {
+                if ((chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT), (int)(position.z-0.25f))) != 0
+                        || chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT), (int)(position.z+0.25f))) != 0
+                        || chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z-0.25f))) != 0
+                        || chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z+0.25f))) != 0)) {
+                    camera.setPositionX((int)Math.round(position.x) + 0.5f);
+                }
             }
-        } else {
-            if ((int)Math.round(position.x)-1 >= 0 &&
-                    (chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT), (int)(position.z-0.25f))) != 0
-                    || chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT), (int)(position.z+0.25f))) != 0
-                    || chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z-0.25f))) != 0
-                    || chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z+0.25f))) != 0)) {
-                camera.setPositionX((int)Math.round(position.x) + 0.5f);
+            
+            if (chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT)-1, (int)(position.z))) != 0) {
+                ground = ((int)position.y-CAMERA_HEIGHT)-1;
             }
-        }
+        } catch (ArrayIndexOutOfBoundsException aioobe) {}
         // request adjacent chunk...
     }
     
@@ -168,7 +176,7 @@ public class Player {
      * @param multiplier the framerate-independent multiplier (1 = 60 FPS)
      */
     void updateHeight(float multiplier) {
-        if (!isGrounded) {
+        if (height != ground) {
             height += velocity * multiplier;
             velocity += GRAVITY * multiplier;
             

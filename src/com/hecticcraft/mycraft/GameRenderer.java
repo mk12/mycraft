@@ -63,7 +63,7 @@ final class GameRenderer implements GameStateListener {
     /**
      * The width and height of the cross hairs in the middle of the screen.
      */
-    private static final float CROSSHAIR_SIZE = 0.1f;
+    private static final float CROSSHAIR_SIZE = 0.025f;
     
     /**
      * The furthest away from this Camera an object that will be rendered can be.
@@ -144,7 +144,7 @@ final class GameRenderer implements GameStateListener {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(45, (float)DISPLAY_WIDTH / (float)DISPLAY_HEIGHT, 0.5f, renderDistance);
+        gluPerspective(45, (float)DISPLAY_WIDTH / (float)DISPLAY_HEIGHT, 0.25f, renderDistance);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -197,8 +197,8 @@ final class GameRenderer implements GameStateListener {
         glLoadIdentity();
         // Draw crosshair
         glBegin(GL_LINES);
-        glVertex3f(-CROSSHAIR_SIZE/2, 0, -1); glVertex3f(CROSSHAIR_SIZE/2, 0, -1);
-        glVertex3f(0, -CROSSHAIR_SIZE/2, -1); glVertex3f(0, CROSSHAIR_SIZE/2, -1);
+        glVertex3f(-CROSSHAIR_SIZE/2, 0, -0.25f); glVertex3f(CROSSHAIR_SIZE/2, 0, -0.25f);
+        glVertex3f(0, -CROSSHAIR_SIZE/2, -0.25f); glVertex3f(0, CROSSHAIR_SIZE/2, -0.25f);
         glEnd();
         
         Display.update();

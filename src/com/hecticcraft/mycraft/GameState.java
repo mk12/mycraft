@@ -105,10 +105,15 @@ final class GameState {
         }
     }
     
+    /**
+     * 
+     * 
+     * @param chunk 
+     */
     void calculateSelectedBlock(Chunk chunk) {
         Vector position = player.getCamera().getPosition();
         Vector sight = player.getCamera().getSight();
-        Vector frontBack;
+        Vector ray;
         Vector step;
         
         selectedBlock = null;
@@ -117,21 +122,23 @@ final class GameState {
         // XY plane (front and back faces)
         float frontBackDistSquared = Float.MAX_VALUE;
         if (sight.z != 0) {
-            if (sight.z > 0) frontBack = position.plus(sight.scaled((float)(Math.ceil(position.z) - position.z) / sight.z));
-            else frontBack = position.plus(sight.scaled((float)(Math.floor(position.z) - position.z) / sight.z));
+            if (sight.z > 0) ray = position.plus(sight.scaled((float)(Math.ceil(position.z) - position.z) / sight.z));
+            else ray = position.plus(sight.scaled((float)(Math.floor(position.z) - position.z) / sight.z));
             step = sight.scaled(Math.abs(1.f / sight.z));
             
-            while (frontBack.x >= 0 && frontBack.x < 8
-                    && frontBack.y >= 0 && frontBack.y < 8
-                    && frontBack.z >= 0 && frontBack.z < 8) {
-                float distSquared = frontBack.minus(position).magnitudeSquared();
+            if (ray.z == 8) ray.add(step);
+            
+            while (ray.x >= 0 && ray.x < 8
+                    && ray.y >= 0 && ray.y < 8
+                    && ray.z >= 0 && ray.z < 8) {
+                float distSquared = ray.minus(position).magnitudeSquared();
                 if (distSquared > ARM_LENGTH * ARM_LENGTH) break;
                 
                 if (sight.z > 0) {
-                     if (chunk.getBlockType(new Block((int)frontBack.x, (int)frontBack.y, (int)frontBack.z)) != 0) {
-                         selectedBlock = new Block((int)frontBack.x, (int)frontBack.y, (int)frontBack.z);
+                     if (chunk.getBlockType(new Block((int)ray.x, (int)ray.y, (int)ray.z)) != 0) {
+                         selectedBlock = new Block((int)ray.x, (int)ray.y, (int)ray.z);
                          if (selectedBlock.z-1 >= 0) {
-                             newBlock = new Block(selectedBlock.x, selectedBlock.y, selectedBlock.z-1); // make sure its air
+                             newBlock = new Block(selectedBlock.x, selectedBlock.y, selectedBlock.z-1);
                              if (chunk.getBlockType(newBlock) != 0) newBlock = null;
                          }
                          
@@ -139,8 +146,8 @@ final class GameState {
                          break;
                      }
                 } else {
-                    if (frontBack.z-1 >= 0 && chunk.getBlockType(new Block((int)frontBack.x, (int)frontBack.y, (int)frontBack.z-1)) != 0) {
-                        selectedBlock = new Block((int)frontBack.x, (int)frontBack.y, (int)frontBack.z-1);
+                    if (ray.z-1 >= 0 && chunk.getBlockType(new Block((int)ray.x, (int)ray.y, (int)ray.z-1)) != 0) {
+                        selectedBlock = new Block((int)ray.x, (int)ray.y, (int)ray.z-1);
                         if (selectedBlock.z+1 < 8) {
                             newBlock = new Block(selectedBlock.x, selectedBlock.y, selectedBlock.z+1);
                             if (chunk.getBlockType(newBlock) != 0) newBlock = null;
@@ -150,9 +157,97 @@ final class GameState {
                         break;
                     }
                 }
-                    frontBack.add(step);
+                ray.add(step);
             }
         }
+        
+        // YZ plane (left and right faces)
+        float leftRightDistSquared = Float.MAX_VALUE;
+        if (sight.x != 0) {
+            if (sight.x > 0) ray = position.plus(sight.scaled((float)(Math.ceil(position.x) - position.x) / sight.x));
+            else ray = position.plus(sight.scaled((float)(Math.floor(position.x) - position.x) / sight.x));
+            step = sight.scaled(Math.abs(1.f / sight.x));
+            
+            if (ray.x == 8) ray.add(step);
+            
+            while (ray.x >= 0 && ray.x < 8
+                    && ray.y >= 0 && ray.y < 8
+                    && ray.z >= 0 && ray.z < 8) {
+                float distSquared = ray.minus(position).magnitudeSquared();
+                if (distSquared > ARM_LENGTH * ARM_LENGTH || distSquared > frontBackDistSquared) break;
+                
+                if (sight.x > 0) {
+                     if (chunk.getBlockType(new Block((int)ray.x, (int)ray.y, (int)ray.z)) != 0) {
+                         selectedBlock = new Block((int)ray.x, (int)ray.y, (int)ray.z);
+                         if (selectedBlock.x-1 >= 0) {
+                             newBlock = new Block(selectedBlock.x-1, selectedBlock.y, selectedBlock.z);
+                             if (chunk.getBlockType(newBlock) != 0) newBlock = null;
+                         }
+                         
+                         leftRightDistSquared = distSquared;
+                         break;
+                     }
+                } else {
+                    if (ray.x-1 >= 0 && chunk.getBlockType(new Block((int)ray.x-1, (int)ray.y, (int)ray.z)) != 0) {
+                        selectedBlock = new Block((int)ray.x-1, (int)ray.y, (int)ray.z);
+                        if (selectedBlock.x+1 < 8) {
+                            newBlock = new Block(selectedBlock.x+1, selectedBlock.y, selectedBlock.z);
+                            if (chunk.getBlockType(newBlock) != 0) newBlock = null;
+                        }
+                        
+                        leftRightDistSquared = distSquared;
+                        break;
+                    }
+                }
+                ray.add(step);
+            }
+        }
+        
+        // XZ plane (bottom and top faces)
+        float bottomTopDistSquared = Float.MAX_VALUE;
+        if (sight.y != 0) {
+            if (sight.y > 0) ray = position.plus(sight.scaled((float)(Math.ceil(position.y) - position.y) / sight.y));
+            else ray = position.plus(sight.scaled((float)(Math.floor(position.y) - position.y) / sight.y));
+            step = sight.scaled(Math.abs(1.f / sight.y));
+            
+            if (ray.y == 8) ray.add(step);
+            
+            while (ray.x >= 0 && ray.x < 8
+                    && ray.y >= 0 && ray.y < 8
+                    && ray.z >= 0 && ray.z < 8) {
+                float distSquared = ray.minus(position).magnitudeSquared();
+                if (distSquared > ARM_LENGTH * ARM_LENGTH || distSquared > frontBackDistSquared || distSquared > leftRightDistSquared) break;
+                
+                if (sight.y > 0) {
+                     if (chunk.getBlockType(new Block((int)ray.x, (int)ray.y, (int)ray.z)) != 0) {
+                         selectedBlock = new Block((int)ray.x, (int)ray.y, (int)ray.z);
+                         if (selectedBlock.y-1 >= 0) {
+                             newBlock = new Block(selectedBlock.x, selectedBlock.y-1, selectedBlock.z);
+                             if (chunk.getBlockType(newBlock) != 0) newBlock = null;
+                         }
+                         
+                         bottomTopDistSquared = distSquared;
+                         break;
+                     }
+                } else {
+                    if (ray.y-1 >= 0 && chunk.getBlockType(new Block((int)ray.x, (int)ray.y-1, (int)ray.z)) != 0) {
+                        selectedBlock = new Block((int)ray.x, (int)ray.y-1, (int)ray.z);
+                        if (selectedBlock.y+1 < 8) {
+                            newBlock = new Block(selectedBlock.x, selectedBlock.y+1, selectedBlock.z);
+                            if (chunk.getBlockType(newBlock) != 0) newBlock = null;
+                        }
+                        
+                        bottomTopDistSquared = distSquared;
+                        break;
+                    }
+                }
+                ray.add(step);
+            }
+        }
+        
+        
+        //debug
+        //selectedBlock = new Block((int)Math.round(position.x), (int)(position.y-1.5f-1), (int)(position.z));
     }
     
     /** PROBLEM: camera class in state, but uses RHS system 
