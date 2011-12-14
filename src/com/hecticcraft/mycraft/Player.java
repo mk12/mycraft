@@ -35,7 +35,8 @@ package com.hecticcraft.mycraft;
  * @author Mitchell Kember
  * @since 09/12/2011
  */
-public class Player {/****** GROUND/isjumping not needed, testing every frame if on block?*****/
+public class Player {
+    // done documenting: mycraft, controller, camera, vector, gamestateinputdata
     
     /**
      * The number of units above this Player's feet that the head or Camera
