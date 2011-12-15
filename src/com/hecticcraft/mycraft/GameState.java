@@ -95,7 +95,6 @@ final class GameState {
         player.move(input, multiplier);
         player.collision(chunk);
         if (input.jump) player.jump();
-        player.updateHeight(multiplier);
         
         calculateSelectedBlock(chunk);
         

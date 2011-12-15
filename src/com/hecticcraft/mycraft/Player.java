@@ -90,6 +90,8 @@ public class Player {
         camera.setPositionY(height+CAMERA_HEIGHT);
     }
     
+    private Vector deltaPosition;
+    
     /**
      * Causes this Player to jump, unless this Player is already in the air
      * (jumping or falling) in which case nothing happens.
@@ -116,11 +118,8 @@ public class Player {
         if (position.z < 0) camera.setPositionZ(0);
         else if (position.z > 8) camera.setPositionZ(8);
         
-        Vector sight = camera.getSight();
-        
-        // dont use sight.x, could b moving backwards (or strafing :/)
         try {
-            if (sight.x > 0) {
+            if (deltaPosition.x > 0) {
                 if (chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT), (int)(position.z-0.25f))) != 0
                         || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT), (int)(position.z+0.25f))) != 0
                         || chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT+1), (int)(position.z-0.25f))) != 0
@@ -136,9 +135,25 @@ public class Player {
                 }
             }
             
+            if (deltaPosition.z > 0) {
+                if (chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(position.y-CAMERA_HEIGHT), (int)Math.round(position.z))) != 0
+                        || chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(position.y-CAMERA_HEIGHT), (int)Math.round(position.z))) != 0
+                        || chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(position.y-CAMERA_HEIGHT+1), (int)Math.round(position.z))) != 0
+                        || chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(position.y-CAMERA_HEIGHT+1), (int)Math.round(position.z))) != 0) {
+                    camera.setPositionZ((int)Math.round(position.z) - 0.5f);
+                }
+            } else {
+                if (chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(position.y-CAMERA_HEIGHT), (int)Math.round(position.z)-1)) != 0
+                        || chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(position.y-CAMERA_HEIGHT), (int)Math.round(position.z)-1)) != 0
+                        || chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(position.y-CAMERA_HEIGHT+1), (int)Math.round(position.z)-1)) != 0
+                        || chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(position.y-CAMERA_HEIGHT+1), (int)Math.round(position.z)-1)) != 0) {
+                    camera.setPositionZ((int)Math.round(position.z) + 0.5f);
+                }
+            }
+            /*
             if (chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT)-1, (int)(position.z))) != 0) {
                 ground = ((int)position.y-CAMERA_HEIGHT)-1;
-            }
+            }*/
         } catch (ArrayIndexOutOfBoundsException aioobe) {}
         // request adjacent chunk...
     }
@@ -150,6 +165,7 @@ public class Player {
      * @param multiplier 
      */
     void move(GameStateInputData input, float multiplier) {
+        Vector previousPosition = camera.getPosition();
         // Movement
         if (input.forward) {
             camera.moveForward(MOVE_SPEED * multiplier);
@@ -164,18 +180,6 @@ public class Player {
             camera.strafeRight(MOVE_SPEED * multiplier);
         }
         
-        // Orient the camera
-        camera.pitch(input.lookDeltaY);
-        camera.yaw(input.lookDeltaX);
-    }
-    
-    /**
-     * Updates the height of this Player, if currently in the air. If this player
-     * is on something solid, this does nothing.
-     * 
-     * @param multiplier the framerate-independent multiplier (1 = 60 FPS)
-     */
-    void updateHeight(float multiplier) {
         if (height != ground) {
             height += velocity * multiplier;
             velocity += GRAVITY * multiplier;
@@ -188,6 +192,14 @@ public class Player {
             
             camera.setPositionY(height+CAMERA_HEIGHT);
         }
+        
+        deltaPosition = camera.getPosition().minus(previousPosition);
+        
+        // Orient the camera
+        camera.pitch(input.lookDeltaY);
+        camera.yaw(input.lookDeltaX);
+        
+        
     }
     
     /**
