@@ -98,9 +98,14 @@ final class GameState {
         
         calculateSelectedBlock(chunk);
         
-        if (input.placeBlock && selectedBlock != null && newBlock != null) { // won't need newBlock==null when all faces are detected
-            chunk.setBlockType(newBlock, (byte)1);
-            listener.gameStateChunkChanged(chunk);
+        if (selectedBlock != null && newBlock != null) {
+            if (input.breakBlock) {
+                chunk.setBlockType(selectedBlock, (byte)0);
+                listener.gameStateChunkChanged(chunk);
+            } else if (input.placeBlock) {
+                chunk.setBlockType(newBlock, (byte)1);
+                listener.gameStateChunkChanged(chunk);
+            }
         }
     }
     

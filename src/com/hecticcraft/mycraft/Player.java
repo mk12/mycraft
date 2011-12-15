@@ -60,12 +60,6 @@ public class Player {
     private static final float INITAL_JUMP_VELOCITY = 0.25f;
     
     /**
-     * Whether this Player is on something solid. If false, this Player is in
-     * the air (either jumping or falling).
-     */
-    private boolean isGrounded = false;
-    
-    /**
      * The height of what the Player is currently standing on.
      */
     private float ground = 0;
@@ -100,7 +94,6 @@ public class Player {
         if (height == ground) {
             ground = 0;
             height += 0.0001f;
-            isGrounded = false;
             velocity = INITAL_JUMP_VELOCITY;
         }
     }
@@ -150,10 +143,10 @@ public class Player {
                     camera.setPositionZ((int)Math.round(position.z) + 0.5f);
                 }
             }
-            /*
+            
             if (chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT)-1, (int)(position.z))) != 0) {
-                ground = ((int)position.y-CAMERA_HEIGHT)-1;
-            }*/
+                ground = ((int)position.y-CAMERA_HEIGHT);
+            }
         } catch (ArrayIndexOutOfBoundsException aioobe) {}
         // request adjacent chunk...
     }
@@ -187,7 +180,6 @@ public class Player {
             if (height < ground) {
                 height = ground;
                 velocity = 0;
-                isGrounded = true;
             }
             
             camera.setPositionY(height+CAMERA_HEIGHT);

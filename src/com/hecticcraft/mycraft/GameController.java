@@ -73,9 +73,14 @@ final class GameController {
     private GameState state;
     
     /**
-     * Used for detecting mouse clicks.
+     * Used for detecting left mouse clicks.
      */
-    private boolean wasMouseButtonDown = false;
+    private boolean wasLeftMouseButtonDown = false;
+    
+    /**
+     * Used for detecting right mouse clicks.
+     */
+    private boolean wasRightMouseButtonDown = false;
     
     /**
      * Used for calculating delta time between frames.
@@ -136,12 +141,15 @@ final class GameController {
      * @return true if it is down and it wasn't last time this method was called
      */
     private boolean wasMouseClicked(MouseButton button) {
-        // Check if the specified button is down
         boolean buttonDown = Mouse.isButtonDown(button.ordinal());
-        // Check if it is was up before and down now
-        boolean clicked = !wasMouseButtonDown && buttonDown;
-        // New becomes old for next call
-        wasMouseButtonDown = buttonDown;
+        boolean clicked = false;
+        if (button == MouseButton.LEFT) {
+            clicked = !wasLeftMouseButtonDown && buttonDown;
+            wasLeftMouseButtonDown = buttonDown;
+        } else if (button == MouseButton.RIGHT) {
+            clicked = !wasRightMouseButtonDown && buttonDown;
+            wasRightMouseButtonDown = buttonDown;
+        }
         
         return clicked;
     }
@@ -161,6 +169,7 @@ final class GameController {
                         Keyboard.isKeyDown(Keyboard.KEY_D),
                         Keyboard.isKeyDown(Keyboard.KEY_SPACE),
                         Mouse.getDX(), Mouse.getDY(), Mouse.getDWheel() / -120,
+                        wasMouseClicked(MouseButton.LEFT),
                         wasMouseClicked(MouseButton.RIGHT)),
                         getDeltaTime());
                 

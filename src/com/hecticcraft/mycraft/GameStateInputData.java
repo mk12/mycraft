@@ -53,6 +53,7 @@ final class GameStateInputData {
     
     final int cycleBlock;
     
+    final boolean breakBlock;
     final boolean placeBlock;
     
     /**
@@ -68,7 +69,7 @@ final class GameStateInputData {
      * @param cycleBlock how many times the Player should cycle the block being held (wraps around)
      * @param placeBlock if the Player should place a block
      */
-    GameStateInputData(boolean forward, boolean backward, boolean left, boolean right, boolean jump, float lookDeltaX, float lookDeltaY, int cycleBlock, boolean placeBlock) {
+    GameStateInputData(boolean forward, boolean backward, boolean left, boolean right, boolean jump, float lookDeltaX, float lookDeltaY, int cycleBlock, boolean breakBlock, boolean placeBlock) {
         this.forward = forward;
         this.backward = backward;
         this.left = left;
@@ -77,6 +78,11 @@ final class GameStateInputData {
         this.lookDeltaX = lookDeltaX * lookSensitivity;
         this.lookDeltaY = lookDeltaY * lookSensitivity;
         this.cycleBlock = cycleBlock;
+        
+        if (breakBlock && placeBlock) {
+            throw new IllegalArgumentException();
+        }
+        this.breakBlock = breakBlock;
         this.placeBlock = placeBlock;
     }
     
