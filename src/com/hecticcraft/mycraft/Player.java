@@ -57,7 +57,7 @@ public class Player {
     /**
      * The initial upward velocity this Player will have upon jumping.
      */
-    private static final float INITAL_JUMP_VELOCITY = 0.25f;
+    private static final float INITAL_JUMP_VELOCITY = 0.2f;
     
     /**
      * The height of what the Player is currently standing on.
@@ -143,7 +143,28 @@ public class Player {
             }
         }
         
-        if (velocity > 0) {
+        // falling
+        if (deltaPosition.y <= 0) {
+            int drop = (int)height;
+            /*
+            do {
+                ray--;
+            } while (ray >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x), ray, (int)Math.round(position.z))) == 0);*/
+            
+            // Error Checking needed!!
+            while (drop >= 1 && !((chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z))) != 0)
+                    || (chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z))) != 0)
+                    || (chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z+0.25f))) != 0)
+                    || (chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z+0.25f))) != 0)
+                    || (chunk.getBlockType(new Block((int)(position.x-0.25f), drop-1, (int)(position.z))) != 0)
+                    || (chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z-0.25f))) != 0)
+                    || (chunk.getBlockType(new Block((int)(position.x-0.25f), drop-1, (int)(position.z-0.25f))) != 0)
+                    || (chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z-0.25f))) != 0)
+                    || (chunk.getBlockType(new Block((int)(position.x-0.25f), drop-1, (int)(position.z+0.25f))) != 0))) {
+                drop--;
+            }
+            
+            ground = drop;
             
         } else {
             
@@ -185,6 +206,9 @@ public class Player {
             
             if (height < ground) {
                 height = ground;
+                velocity = 0;
+            } else if (height + CAMERA_HEIGHT > 8) {
+                height = 8 - CAMERA_HEIGHT;
                 velocity = 0;
             }
             
