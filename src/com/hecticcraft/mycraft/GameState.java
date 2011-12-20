@@ -130,11 +130,11 @@ final class GameState {
             else ray = position.plus(sight.scaled((float)(Math.floor(position.z) - position.z) / sight.z));
             step = sight.scaled(Math.abs(1.f / sight.z));
             
-            if (ray.z == 8) ray.add(step);
+            if (ray.z == 16) ray.add(step);
             
-            while (ray.x >= 0 && ray.x < 8
-                    && ray.y >= 0 && ray.y < 8
-                    && ray.z >= 0 && ray.z < 8) {
+            while (ray.x >= 0 && ray.x < 16
+                    && ray.y >= 0 && ray.y < 16
+                    && ray.z >= 0 && ray.z < 16) {
                 float distSquared = ray.minus(position).magnitudeSquared();
                 if (distSquared > ARM_LENGTH * ARM_LENGTH) break;
                 
@@ -152,7 +152,7 @@ final class GameState {
                 } else {
                     if (ray.z-1 >= 0 && chunk.getBlockType(new Block((int)ray.x, (int)ray.y, (int)ray.z-1)) != 0) {
                         selectedBlock = new Block((int)ray.x, (int)ray.y, (int)ray.z-1);
-                        if (selectedBlock.z+1 < 8) {
+                        if (selectedBlock.z+1 < 16) {
                             newBlock = new Block(selectedBlock.x, selectedBlock.y, selectedBlock.z+1);
                             if (chunk.getBlockType(newBlock) != 0) newBlock = null;
                         }
@@ -172,11 +172,11 @@ final class GameState {
             else ray = position.plus(sight.scaled((float)(Math.floor(position.x) - position.x) / sight.x));
             step = sight.scaled(Math.abs(1.f / sight.x));
             
-            if (ray.x == 8) ray.add(step);
+            if (ray.x == 16) ray.add(step);
             
-            while (ray.x >= 0 && ray.x < 8
-                    && ray.y >= 0 && ray.y < 8
-                    && ray.z >= 0 && ray.z < 8) {
+            while (ray.x >= 0 && ray.x < 16
+                    && ray.y >= 0 && ray.y < 16
+                    && ray.z >= 0 && ray.z < 16) {
                 float distSquared = ray.minus(position).magnitudeSquared();
                 if (distSquared > ARM_LENGTH * ARM_LENGTH || distSquared > frontBackDistSquared) break;
                 
@@ -194,7 +194,7 @@ final class GameState {
                 } else {
                     if (ray.x-1 >= 0 && chunk.getBlockType(new Block((int)ray.x-1, (int)ray.y, (int)ray.z)) != 0) {
                         selectedBlock = new Block((int)ray.x-1, (int)ray.y, (int)ray.z);
-                        if (selectedBlock.x+1 < 8) {
+                        if (selectedBlock.x+1 < 16) {
                             newBlock = new Block(selectedBlock.x+1, selectedBlock.y, selectedBlock.z);
                             if (chunk.getBlockType(newBlock) != 0) newBlock = null;
                         }
@@ -214,11 +214,11 @@ final class GameState {
             else ray = position.plus(sight.scaled((float)(Math.floor(position.y) - position.y) / sight.y));
             step = sight.scaled(Math.abs(1.f / sight.y));
             
-            if (ray.y == 8) ray.add(step);
+            if (ray.y == 16) ray.add(step);
             
-            while (ray.x >= 0 && ray.x < 8
-                    && ray.y >= 0 && ray.y < 8
-                    && ray.z >= 0 && ray.z < 8) {
+            while (ray.x >= 0 && ray.x < 16
+                    && ray.y >= 0 && ray.y < 16
+                    && ray.z >= 0 && ray.z < 16) {
                 float distSquared = ray.minus(position).magnitudeSquared();
                 if (distSquared > ARM_LENGTH * ARM_LENGTH || distSquared > frontBackDistSquared || distSquared > leftRightDistSquared) break;
                 
@@ -236,7 +236,7 @@ final class GameState {
                 } else {
                     if (ray.y-1 >= 0 && chunk.getBlockType(new Block((int)ray.x, (int)ray.y-1, (int)ray.z)) != 0) {
                         selectedBlock = new Block((int)ray.x, (int)ray.y-1, (int)ray.z);
-                        if (selectedBlock.y+1 < 8) {
+                        if (selectedBlock.y+1 < 16) {
                             newBlock = new Block(selectedBlock.x, selectedBlock.y+1, selectedBlock.z);
                             if (chunk.getBlockType(newBlock) != 0) newBlock = null;
                         }
@@ -262,7 +262,7 @@ final class GameState {
      isolate rendering and state (camera .. ) 
      player position and camera position ?
      * 
-     * cant place blocks when at back corner (z=8 in state)
+     * cant place blocks when at back corner (z=16 in state)
      * http://www.matrix44.net/cms/notes/opengl-3d-graphics/coordinate-systems-in-opengl
      
      **/

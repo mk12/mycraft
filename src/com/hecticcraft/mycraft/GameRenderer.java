@@ -310,10 +310,10 @@ final class GameRenderer implements GameStateListener {
         byte[][][] data = chunk.getData();
         IntBuffer vertexData = BufferUtils.createIntBuffer(70000);
         
-        for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) {
-                for (int z = 0; z > -8; z--) {
-                    if (data[x][y][-z] != 0) vertexData.put(cubeData(x,y,z));
+        for (int x = 0; x < 16; x++) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z > -16; z--) {
+                    if (data[x][y][-z] != 0) vertexData.put(cubeData(x, y, z));
                 }
             }
         }

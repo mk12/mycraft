@@ -47,17 +47,17 @@ public class Player {
     /**
      * Speed in units per 60 FPS frame for this Player's movement.
      */
-    private static final float MOVE_SPEED = 0.075f;
+    private static final float MOVE_SPEED = 0.07f;
     
     /**
      * The pull of gravity, in units per 60 FPS frame.
      */
-    private static final float GRAVITY = -0.015f;
+    private static final float GRAVITY = -0.012f;
     
     /**
      * The initial upward velocity this Player will have upon jumping.
      */
-    private static final float INITAL_JUMP_VELOCITY = 0.2f;
+    private static final float INITAL_JUMP_VELOCITY = 0.18f;
     
     /**
      * The height of what the Player is currently standing on.
@@ -107,38 +107,38 @@ public class Player {
         // Boundaries
         Vector position = camera.getPosition();
         if (position.x < 0) camera.setPositionX(0);
-        else if (position.x > 8) camera.setPositionX(8);
+        else if (position.x > 16) camera.setPositionX(16);
         if (position.z < 0) camera.setPositionZ(0);
-        else if (position.z > 8) camera.setPositionZ(8);
+        else if (position.z > 16) camera.setPositionZ(16);
         
         if (deltaPosition.x > 0) {
-            if ((int)Math.round(position.x) < 8 && (int)Math.round(position.x) > position.x && ((position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height), (int)(position.z-0.25f))) != 0)
-                    || (position.z+0.25f < 8 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height), (int)(position.z+0.25f))) != 0)
-                    || (height + 1 < 8 && position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height+1), (int)(position.z-0.25f))) != 0)
-                    || (height + 1 < 8 && position.z+0.25f < 8 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height+1), (int)(position.z+0.25f))) != 0))) {
+            if ((int)Math.round(position.x) < 16 && (int)Math.round(position.x) > position.x && ((position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height), (int)(position.z-0.25f))) != 0)
+                    || (position.z+0.25f < 16 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height), (int)(position.z+0.25f))) != 0)
+                    || (height + 1 < 16 && position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height+1), (int)(position.z-0.25f))) != 0)
+                    || (height + 1 < 16 && position.z+0.25f < 16 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height+1), (int)(position.z+0.25f))) != 0))) {
                 camera.setPositionX((int)Math.round(position.x) - 0.5f);
             }
         } else {
             if ((int)Math.round(position.x)-1 >= 0 && (int)Math.round(position.x) < position.x && ((position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(height), (int)(position.z-0.25f))) != 0)
-                    || (position.z+0.25f < 8 && chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(height), (int)(position.z+0.25f))) != 0)
-                    || (height + 1 < 8 && position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(height+1), (int)(position.z-0.25f))) != 0)
-                    || (height + 1 < 8 && position.z+0.25f < 8 && chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(height+1), (int)(position.z+0.25f))) != 0))) {
+                    || (position.z+0.25f < 16 && chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(height), (int)(position.z+0.25f))) != 0)
+                    || (height + 1 < 16 && position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(height+1), (int)(position.z-0.25f))) != 0)
+                    || (height + 1 < 16 && position.z+0.25f < 16 && chunk.getBlockType(new Block((int)Math.round(position.x)-1, (int)(height+1), (int)(position.z+0.25f))) != 0))) {
                 camera.setPositionX((int)Math.round(position.x) + 0.5f);
             }
         }
         
         if (deltaPosition.z > 0) {
-            if ((int)Math.round(position.z) < 8 && (int)Math.round(position.z) > position.z && ((position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(height), (int)Math.round(position.z))) != 0)
-                    || (position.x+0.25f < 8 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(height), (int)Math.round(position.z))) != 0)
-                    || (height+1 < 8 && position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(height+1), (int)Math.round(position.z))) != 0)
-                    || (height+1 < 8 && position.x+0.25f < 8 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(height+1), (int)Math.round(position.z))) != 0))) {
+            if ((int)Math.round(position.z) < 16 && (int)Math.round(position.z) > position.z && ((position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(height), (int)Math.round(position.z))) != 0)
+                    || (position.x+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(height), (int)Math.round(position.z))) != 0)
+                    || (height+1 < 16 && position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(height+1), (int)Math.round(position.z))) != 0)
+                    || (height+1 < 16 && position.x+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(height+1), (int)Math.round(position.z))) != 0))) {
                 camera.setPositionZ((int)Math.ceil(position.z) - 0.5f);
             }
         } else {
             if ((int)Math.round(position.z)-1 >= 0 && (int)Math.round(position.z) < position.z && ((position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(height), (int)Math.round(position.z)-1)) != 0)
-                    || (position.x+0.25f < 8 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(height), (int)Math.round(position.z)-1)) != 0)
-                    || (height+1 < 8 && position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(height+1), (int)Math.round(position.z)-1)) != 0)
-                    || (height+1 < 8 && position.x+0.25f < 8 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(height+1), (int)Math.round(position.z)-1)) != 0))) {
+                    || (position.x+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(height), (int)Math.round(position.z)-1)) != 0)
+                    || (height+1 < 16 && position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(height+1), (int)Math.round(position.z)-1)) != 0)
+                    || (height+1 < 16 && position.x+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(height+1), (int)Math.round(position.z)-1)) != 0))) {
                 camera.setPositionZ((int)Math.round(position.z) + 0.5f);
             }
         }
@@ -207,8 +207,8 @@ public class Player {
             if (height < ground) {
                 height = ground;
                 velocity = 0;
-            } else if (height + CAMERA_HEIGHT > 8) {
-                height = 8 - CAMERA_HEIGHT;
+            } else if (height + CAMERA_HEIGHT > 16) {
+                height = 16 - CAMERA_HEIGHT;
                 velocity = 0;
             }
             

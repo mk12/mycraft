@@ -28,7 +28,7 @@
 package com.hecticcraft.mycraft;
 
 /**
- * Chunk represents a chunk of 8 by 8 by 8 blocks in the MyCraft world.
+ * Chunk represents a chunk of 16 by 16 by 16 blocks in the MyCraft world.
  * Each block uses one byte to represent its type, totaling 512 bytes to
  * store the information for one Chunk.
  * 
@@ -48,7 +48,7 @@ final class Chunk {
      * 
      * {@code data[x][y][z]}
      */
-    private byte[][][] data = new byte[8][8][8];
+    private byte[][][] data = new byte[16][16][16];
     
     {
         // Place some blocks
@@ -58,6 +58,9 @@ final class Chunk {
         data[4][2][7] = 1;
         data[7][0][7] = 1;
         data[2][0][2] = 1;
+        data[15][0][0] = 1;
+        data[15][0][15] = 1;
+        data[0][0][15] = 1;
     }
     
     /**
