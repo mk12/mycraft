@@ -52,6 +52,7 @@ final class Chunk {
     
     {
         // Place some blocks
+        /*
         data[0][0][7] = 1;
         data[3][1][7] = 1;
         data[3][0][6] = 1;
@@ -60,7 +61,13 @@ final class Chunk {
         data[2][0][2] = 1;
         data[15][0][0] = 1;
         data[15][0][15] = 1;
-        data[0][0][15] = 1;
+        data[0][0][15] = 1;*/
+        
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                data[x][0][z] = 1;
+            }
+        }
     }
     
     /**

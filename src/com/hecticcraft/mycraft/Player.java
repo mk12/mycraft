@@ -68,7 +68,7 @@ public class Player {
      * The height of this Player; this Player's Y coordinate in 3D space where
      * positive Y is upwards.
      */
-    private float height = 0;
+    private float height = 5;
     
     /**
      * The vertical velocity of this Player, used for jumping and falling.
