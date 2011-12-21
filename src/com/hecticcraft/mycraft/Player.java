@@ -162,15 +162,8 @@ public class Player {
             ground = drop;
             
         } else {
-            
+            // collision with blocks above your head
         }
-        /*
-        Vector ray = camera.getPosition();
-        
-        if (chunk.getBlockType(new Block((int)Math.round(position.x), (int)(position.y-CAMERA_HEIGHT)-1, (int)(position.z))) != 0) {
-            ground = ((int)position.y-CAMERA_HEIGHT);
-        }*/
-        // request adjacent chunk...
     }
     
     /**
