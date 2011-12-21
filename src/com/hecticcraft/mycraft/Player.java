@@ -146,21 +146,16 @@ public class Player {
         // falling
         if (deltaPosition.y <= 0) {
             int drop = (int)height;
-            /*
-            do {
-                ray--;
-            } while (ray >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x), ray, (int)Math.round(position.z))) == 0);*/
             
-            // Error Checking needed!!
-            while (drop >= 1 && !((chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z))) != 0)
-                    || (chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z))) != 0)
-                    || (chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z+0.25f))) != 0)
-                    || (chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z+0.25f))) != 0)
-                    || (chunk.getBlockType(new Block((int)(position.x-0.25f), drop-1, (int)(position.z))) != 0)
-                    || (chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z-0.25f))) != 0)
-                    || (chunk.getBlockType(new Block((int)(position.x-0.25f), drop-1, (int)(position.z-0.25f))) != 0)
-                    || (chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z-0.25f))) != 0)
-                    || (chunk.getBlockType(new Block((int)(position.x-0.25f), drop-1, (int)(position.z+0.25f))) != 0))) {
+            while (drop >= 1 && !(((int)position.x < 16 && (int)position.z < 16 && chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z))) != 0)
+                    || ((int)position.z < 16 && position.x+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z))) != 0)
+                    || ((int)position.x < 16 && position.z+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z+0.25f))) != 0)
+                    || (position.x+0.25f < 16 && position.z+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z+0.25f))) != 0)
+                    || ((int)position.z < 16 && position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), drop-1, (int)(position.z))) != 0)
+                    || ((int)position.x < 16 && position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z-0.25f))) != 0)
+                    || (position.z-0.25f >= 0 && position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), drop-1, (int)(position.z-0.25f))) != 0)
+                    || (position.x+0.25f < 16 && position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z-0.25f))) != 0)
+                    || (position.x-0.25f >= 0 && position.z+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x-0.25f), drop-1, (int)(position.z+0.25f))) != 0))) {
                 drop--;
             }
             
