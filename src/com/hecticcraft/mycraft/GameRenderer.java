@@ -48,7 +48,8 @@ import org.newdawn.slick.util.ResourceLoader;
  * GameRenderer is responsible for managing the application's window and
  * rendering an instance of GameState into it.
  * 
- * note: crash
+ * Note: sometimes the Java VM will crash when placing a block. It doesn't happen
+ * often, but I have no idea why this happens.
  * 
  * @author Mitchell Kember
  * @since 07/12/2011
