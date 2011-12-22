@@ -77,7 +77,6 @@ final class MyCraft {
             controller.run(); // begin the main loop
         } catch (LWJGLException lwjgle) {
             LOGGER.log(Level.SEVERE, lwjgle.toString(), lwjgle);
-            System.out.println("NOOO");
         } finally {
             if (controller != null) {
                 // Clean up

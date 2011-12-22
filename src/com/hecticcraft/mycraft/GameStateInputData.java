@@ -79,6 +79,7 @@ final class GameStateInputData {
         this.lookDeltaY = lookDeltaY * lookSensitivity;
         this.cycleBlock = cycleBlock;
         
+        // You can't break and place a block at the same time!
         if (breakBlock && placeBlock) {
             throw new IllegalArgumentException();
         }

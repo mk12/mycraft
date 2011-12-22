@@ -73,6 +73,11 @@ final class GameController {
     private GameState state;
     
     /**
+     * Used for detecting space bar presses.
+     */
+    boolean wasSpaceBarDown = false;
+    
+    /**
      * Used for detecting left mouse clicks.
      */
     private boolean wasLeftMouseButtonDown = false;
@@ -143,6 +148,8 @@ final class GameController {
     private boolean wasMouseClicked(MouseButton button) {
         boolean buttonDown = Mouse.isButtonDown(button.ordinal());
         boolean clicked = false;
+        
+        // Determine if the mouse button wasn't down before but is now
         if (button == MouseButton.LEFT) {
             clicked = !wasLeftMouseButtonDown && buttonDown;
             wasLeftMouseButtonDown = buttonDown;
@@ -152,6 +159,19 @@ final class GameController {
         }
         
         return clicked;
+    }
+    
+    /**
+     * Determines whether the space bar key was pressed.
+     * 
+     * @return true if the space bar was not pressed last time this was called but is now
+     */
+    private boolean wasSpaceBarPressed() {
+        boolean spaceBarDown = Keyboard.isKeyDown(Keyboard.KEY_SPACE);
+        boolean wasPressed = !wasSpaceBarDown && spaceBarDown;
+        wasSpaceBarDown = spaceBarDown;
+        
+        return wasPressed;
     }
     
     /**
@@ -167,11 +187,15 @@ final class GameController {
                         Keyboard.isKeyDown(Keyboard.KEY_S),
                         Keyboard.isKeyDown(Keyboard.KEY_A),
                         Keyboard.isKeyDown(Keyboard.KEY_D),
-                        Keyboard.isKeyDown(Keyboard.KEY_SPACE),
+                        wasSpaceBarPressed(),
                         Mouse.getDX(), Mouse.getDY(), Mouse.getDWheel() / -120,
                         wasMouseClicked(MouseButton.LEFT),
                         wasMouseClicked(MouseButton.RIGHT)),
-                        getDeltaTime());
+                        // Using the delta time for a framerate-independent simulation
+                        // should be the correct way to do things but it produces strange
+                        // results on the school computers, so instead simulate one
+                        // sixtieth of a second every frame.
+                        /*getDeltaTime()*/ 1000.f / 60.f);
                 
                 // Render it
                 renderer.render(state);

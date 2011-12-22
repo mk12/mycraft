@@ -90,51 +90,68 @@ final class GameState {
      * @see GameStateInputData
      */
     void update(GameStateInputData input, float deltaTime) {
+        // Everything is simulated to look correct at 60FPS, and is multiplied
+        // by this to match the real framerate.
         float multiplier = deltaTime / (100.f / 6.f);
         
+        // Player movement
         player.move(input, multiplier);
         player.collision(chunk);
         if (input.jump) player.jump();
         
+        // Set selectedBlock and newBlock
         calculateSelectedBlock(chunk);
         
+        // Break or place a block
         if (selectedBlock != null && newBlock != null) {
             if (input.breakBlock) {
                 chunk.setBlockType(selectedBlock, (byte)0);
+                // Notify the listener
                 listener.gameStateChunkChanged(chunk);
             } else if (input.placeBlock) {
                 chunk.setBlockType(newBlock, (byte)1);
+                // Notify the listener
                 listener.gameStateChunkChanged(chunk);
             }
         }
     }
     
     /**
+     * Calculates {@code selectedBlock} and {@code newBlock}.
      * 
-     * 
-     * @param chunk 
+     * @param chunk the chunk the Player is in
      */
     void calculateSelectedBlock(Chunk chunk) {
         Vector position = player.getCamera().getPosition();
         Vector sight = player.getCamera().getSight();
-        Vector ray;
-        Vector step;
         
+        Vector ray;  // Vector cast out from the players position to find a block
+        Vector step; // step to increment ray by
+        
+        // Blocks are null unless they become assigned.
         selectedBlock = null;
         newBlock = null;
         
+        // The following works, and is bug-free. That is all.
+        
         // XY plane (front and back faces)
+        // Start out assuming the front/back block is very far away so other blocks
+        // will be chosen first, if there is no block found (if z == 0 or the ray leaves
+        // its confines.
         float frontBackDistSquared = Float.MAX_VALUE;
         if (sight.z != 0) {
+            // Calculate ray and step depending on look direction
             if (sight.z > 0) ray = position.plus(sight.scaled((float)(Math.ceil(position.z) - position.z) / sight.z));
             else ray = position.plus(sight.scaled((float)(Math.floor(position.z) - position.z) / sight.z));
             step = sight.scaled(Math.abs(1.f / sight.z));
             
+            // Do the first step already if z == 16 to prevent an ArrayIndexOutOfBoundsException
             if (ray.z == 16) ray.add(step);
             
             while (ray.x >= 0 && ray.x < 16
                     && ray.y >= 0 && ray.y < 16
                     && ray.z >= 0 && ray.z < 16) {
+                // Give up if we've extended the ray longer than the Player's arm length
                 float distSquared = ray.minus(position).magnitudeSquared();
                 if (distSquared > ARM_LENGTH * ARM_LENGTH) break;
                 
@@ -248,37 +265,21 @@ final class GameState {
                 ray.add(step);
             }
         }
-        
-        
-        //debug
-        //selectedBlock = new Block((int)Math.round(position.x), (int)(position.y-1.5f-1), (int)(position.z));
     }
-    
-    /** PROBLEM: camera class in state, but uses RHS system 
-     block class might abstract away
-     passing around blocks (Vector float...)
-     borderline chunks
-     playerv vs gamestate responsibility
-     isolate rendering and state (camera .. ) 
-     player position and camera position ?
-     * 
-     * cant place blocks when at back corner (z=16 in state)
-     * http://www.matrix44.net/cms/notes/opengl-3d-graphics/coordinate-systems-in-opengl
-     
-     **/
     
     /**
      * Determines whether a block is currently selected or not.
      * 
-     * @return 
+     * @return true if a block is selected
      */
     boolean isBlockSelected() {
         return selectedBlock != null;
     }
     
     /**
+     * Gets the currently selected block.
      * 
-     * @return 
+     * @return the block which is selected
      */
     Block getSelectedBlock() {
         return selectedBlock;

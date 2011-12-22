@@ -29,7 +29,7 @@ package com.hecticcraft.mycraft;
 
 /**
  * Chunk represents a chunk of 16 by 16 by 16 blocks in the MyCraft world.
- * Each block uses one byte to represent its type, totaling 512 bytes to
+ * Each block uses one byte to represent its type, totaling 4 kilobytes to
  * store the information for one Chunk.
  * 
  * @author Mitchell Kember
@@ -40,7 +40,7 @@ final class Chunk {
     /**
      * Not used yet since there is only one Chunk.
      */
-    private Vector position;
+    //private Vector position;
     
     /**
      * This 3D array stores all the types of the blocks in this Chunk. It is in
@@ -51,18 +51,7 @@ final class Chunk {
     private byte[][][] data = new byte[16][16][16];
     
     {
-        // Place some blocks
-        /*
-        data[0][0][7] = 1;
-        data[3][1][7] = 1;
-        data[3][0][6] = 1;
-        data[4][2][7] = 1;
-        data[7][0][7] = 1;
-        data[2][0][2] = 1;
-        data[15][0][0] = 1;
-        data[15][0][15] = 1;
-        data[0][0][15] = 1;*/
-        
+        // Place a ground layer of blocks
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 data[x][0][z] = 1;
@@ -71,7 +60,7 @@ final class Chunk {
     }
     
     /**
-     * Gets this Chunk's data.
+     * Gets this Chunk's data array.
      * 
      * @return the data
      */
@@ -80,14 +69,21 @@ final class Chunk {
     }
     
     /**
+     * Set a block's type.
      * 
-     * @param block
-     * @param type 
+     * @param block the location of the block
+     * @param type its new type id
      */
     void setBlockType(Block block, byte type) {
         data[block.x][block.y][block.z] = type;
     }
     
+    /**
+     * Get a block's type.
+     * 
+     * @param block the location of the block.
+     * @return its type id
+     */
     byte getBlockType(Block block) {
         return data[block.x][block.y][block.z];
     }

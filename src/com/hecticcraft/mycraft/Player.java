@@ -36,7 +36,6 @@ package com.hecticcraft.mycraft;
  * @since 09/12/2011
  */
 public class Player {
-    // done documenting: mycraft, controller, camera, vector, gamestateinputdata
     
     /**
      * The number of units above this Player's feet that the head or Camera
@@ -52,12 +51,12 @@ public class Player {
     /**
      * The pull of gravity, in units per 60 FPS frame.
      */
-    private static final float GRAVITY = -0.012f;
+    private static final float GRAVITY = -0.005f;
     
     /**
      * The initial upward velocity this Player will have upon jumping.
      */
-    private static final float INITAL_JUMP_VELOCITY = 0.18f;
+    private static final float INITAL_JUMP_VELOCITY = 0.11f;
     
     /**
      * The height of what the Player is currently standing on.
@@ -84,6 +83,9 @@ public class Player {
         camera.setPositionY(height+CAMERA_HEIGHT);
     }
     
+    /**
+     * Used for collision detection, to determine which direction this Player is moving.
+     */
     private Vector deltaPosition;
     
     /**
@@ -104,13 +106,14 @@ public class Player {
      * @param chunk the Chunk this Player is in
      */
     void collision(Chunk chunk) {
-        // Boundaries
+        // Boundaries (Y boundaries are handled by the jumping code in the move method).
         Vector position = camera.getPosition();
         if (position.x < 0) camera.setPositionX(0);
         else if (position.x > 16) camera.setPositionX(16);
         if (position.z < 0) camera.setPositionZ(0);
         else if (position.z > 16) camera.setPositionZ(16);
         
+        // Right and left
         if (deltaPosition.x > 0) {
             if ((int)Math.round(position.x) < 16 && (int)Math.round(position.x) > position.x && ((position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height), (int)(position.z-0.25f))) != 0)
                     || (position.z+0.25f < 16 && chunk.getBlockType(new Block((int)Math.round(position.x), (int)(height), (int)(position.z+0.25f))) != 0)
@@ -127,6 +130,7 @@ public class Player {
             }
         }
         
+        // Forward and backward
         if (deltaPosition.z > 0) {
             if ((int)Math.round(position.z) < 16 && (int)Math.round(position.z) > position.z && ((position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)(height), (int)Math.round(position.z))) != 0)
                     || (position.x+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)(height), (int)Math.round(position.z))) != 0)
@@ -143,10 +147,11 @@ public class Player {
             }
         }
         
-        // falling
+        // Falling
         if (deltaPosition.y <= 0) {
             int drop = (int)height;
             
+            // Cast down a line until it reaches a solid block, which is the ground.
             while (drop >= 1 && !(((int)position.x < 16 && (int)position.z < 16 && chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z))) != 0)
                     || ((int)position.z < 16 && position.x+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), drop-1, (int)(position.z))) != 0)
                     || ((int)position.x < 16 && position.z+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x), drop-1, (int)(position.z+0.25f))) != 0)
@@ -160,9 +165,21 @@ public class Player {
             }
             
             ground = drop;
-            
         } else {
-            // collision with blocks above your head
+            // Hitting your head when jumping
+            if ((int)Math.round(position.y) < 16 && (((int)position.x < 16 && (int)position.z < 16 && chunk.getBlockType(new Block((int)(position.x), (int)Math.round(position.y), (int)(position.z))) != 0)
+                    || ((int)position.z < 16 && position.x+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)Math.round(position.y), (int)(position.z))) != 0)
+                    || ((int)position.x < 16 && position.z+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x), (int)Math.round(position.y), (int)(position.z+0.25f))) != 0)
+                    || (position.x+0.25f < 16 && position.z+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)Math.round(position.y), (int)(position.z+0.25f))) != 0)
+                    || ((int)position.z < 16 && position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)Math.round(position.y), (int)(position.z))) != 0)
+                    || ((int)position.x < 16 && position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x), (int)Math.round(position.y), (int)(position.z-0.25f))) != 0)
+                    || (position.z-0.25f >= 0 && position.x-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)Math.round(position.y), (int)(position.z-0.25f))) != 0)
+                    || (position.x+0.25f < 16 && position.z-0.25f >= 0 && chunk.getBlockType(new Block((int)(position.x+0.25f), (int)Math.round(position.y), (int)(position.z-0.25f))) != 0)
+                    || (position.x-0.25f >= 0 && position.z+0.25f < 16 && chunk.getBlockType(new Block((int)(position.x-0.25f), (int)Math.round(position.y), (int)(position.z+0.25f))) != 0))) {
+                // Reposition and stop upward velocity
+                height = (int)Math.ceil(position.y) - CAMERA_HEIGHT - 0.5f;
+                velocity = 0;
+            }
         }
     }
     
@@ -203,6 +220,7 @@ public class Player {
             camera.setPositionY(height+CAMERA_HEIGHT);
         }
         
+        // Calculate the delta position
         deltaPosition = camera.getPosition().minus(previousPosition);
         
         // Orient the camera
