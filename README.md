@@ -1,12 +1,14 @@
 MyCraft
 =======
 
-MyCraft is a game based on Minecraft, written in Java and using the LWJGL library. It is my final summative project for the ICS2O course.
+MyCraft is a simple [Minecraft][] clone written in Java, using [LWJGL][]. It is my final summative project for the ICS2O course.
+
+[Minecraft]: http://minecraft.net
+[LWJGL]: http://lwjgl.org
 
 Contribute
 ----------
-
-MyCraft is developed using [NetBeans][]. Before building MyCraft, go to the properties window of the project, click the libraries node, and in the VM Options, change the last item of the LWJGL directory path to  your operating system (`windows`, `macosx` or `linux`).
+MyCraft is developed using [NetBeans][]. Before building MyCraft, go to the properties window of the project, click the libraries node, and in the VM Options, change the last item of the LWJGL directory path to  your operating system (`windows`, `macosx`, or `linux`).
 
 [NetBeans]: http://netbeans.org
 
