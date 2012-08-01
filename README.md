@@ -6,7 +6,7 @@ MyCraft is a game based on Minecraft, written in Java and using the LWJGL librar
 Contribute
 ----------
 
-MyCraft is developed using [NetBeans][]. Before building and running MyCraft, please go to the properties window of the project, click the libraries node, and in the VM Options, change the last item of the LWJGL directory path to  your operating system (windows, macosx or linux).
+MyCraft is developed using [NetBeans][]. Before building MyCraft, go to the properties window of the project, click the libraries node, and in the VM Options, change the last item of the LWJGL directory path to  your operating system (`windows`, `macosx` or `linux`).
 
 [NetBeans]: http://netbeans.org
 
@@ -19,4 +19,4 @@ Copyright © 2012 Mitchell Kember.
 
 MyCraft is available under the MIT license, see [LICENSE][] for details.
 
-[LICENSE]: https://github.com/mk12/MyCraft/blob/master/LICENSE.md
+[LICENSE]: https://github.com/mk12/mycraft/blob/master/LICENSE.md
