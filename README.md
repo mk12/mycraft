@@ -6,8 +6,8 @@ Mycraft is a simple [Minecraft][] clone written in Java, using [LWJGL][]. It is 
 [Minecraft]: http://minecraft.net
 [LWJGL]: http://lwjgl.org
 
-Contribute
-----------
+Building
+--------
 Mycraft is developed using [NetBeans][]. Before building Mycraft, go to the properties window of the project, click the **Run** node, and in the VM Options, change the last item of the LWJGL directory path to  your operating system (`windows`, `macosx`, or `linux`).
 
 [NetBeans]: http://netbeans.org
