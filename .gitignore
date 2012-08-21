@@ -3,7 +3,7 @@ dist/
 
 *.log*
 
-# OS generated files
+# OS-generated files
 .DS_Store*
 ehthumbs.db
 Icon?
