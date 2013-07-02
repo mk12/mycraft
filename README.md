@@ -19,6 +19,6 @@ License
 
 Copyright © 2012 Mitchell Kember
 
-Mycraft is available under the MIT license; see [LICENSE][] for details.
+Mycraft is available under the MIT License; see [LICENSE][] for details.
 
 [LICENSE]: https://github.com/mk12/mycraft/blob/master/LICENSE.md
