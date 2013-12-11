@@ -15,6 +15,6 @@ Mycraft is developed using [NetBeans][]. Before building Mycraft, go to the prop
 
 "Minecraft" is an official trademark of Mojang AB. This work is not formally related to, endorsed by, or affiliated with Minecraft or Mojang AB.
 
-Copyright © 2012 Mitchell Kember
+© 2012 Mitchell Kember
 
 Mycraft is available under the MIT License; see [LICENSE](LICENSE.md) for details.
