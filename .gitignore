@@ -1,4 +1,9 @@
 build/
 dist/
+target/
 
 *.log*
+temp.txt
+
+.idea
+.iws
